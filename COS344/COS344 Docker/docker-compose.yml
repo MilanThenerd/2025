@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  cpp-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "./:/home/dev/workspace" # Mount the directory
+    ports:
+      - "9229:9229"
+    stdin_open: true
+    tty: true

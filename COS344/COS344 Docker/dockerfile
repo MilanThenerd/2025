@@ -1,0 +1,62 @@
+# Base image with C++ tools
+FROM ubuntu:22.04
+
+# Update and install necessary tools
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gdb \
+    cmake \
+    lldb \
+    git \
+    vim \
+    wget \
+    curl \
+    cmake \
+    make \
+    g++ \
+    libx11-dev \
+    libxi-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    libxrandr-dev \
+    libxext-dev \
+    libxcursor-dev \
+    libxinerama-dev \
+    libxi-dev \
+    pkg-config \
+    freeglut3-dev \
+    mesa-common-dev \
+    libglew-dev \
+    libglfw3-dev \
+    libglm-dev \
+    libao-dev \
+    libmpg123-dev \
+    libxkbcommon-dev \
+    && apt-get clean
+
+# Create a user for non-root development
+#RUN useradd -ms /bin/bash dev
+#USER dev
+WORKDIR /home/dev
+
+
+# Add entrypoint script to simplify running GUI applications
+COPY gladSetup.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/gladSetup.sh
+RUN /usr/local/bin/gladSetup.sh
+
+#RUN cd /usr/local/lib/
+#RUN git clone https://github.com/glfw/glfw.git
+#RUN cd glfw
+#RUN ls
+#RUN cmake .
+#RUN make
+#RUN make install
+COPY glad/include/glad /usr/include/glad
+COPY glad/include/KHR /usr/include/KHR
+
+# Expose port for debugging if needed
+EXPOSE 9229
+
+# Set up a persistent terminal
+CMD ["/bin/bash"]
