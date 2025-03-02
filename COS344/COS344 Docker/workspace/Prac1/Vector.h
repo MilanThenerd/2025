@@ -14,7 +14,7 @@ private:
 
 public:
     Vector();
-    Vector(double* inputData);
+    Vector(double *);
     ~Vector();
     Vector(const Vector<n> &);
     Vector(const Matrix<n,1>& );

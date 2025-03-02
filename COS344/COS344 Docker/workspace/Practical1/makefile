@@ -17,7 +17,7 @@ $(TARGET): $(OBJ)
 	$(CXX) $(OBJ) -o $(TARGET)
 
 # Rule to compile .cpp files into .o files
-%.o: src/%.cpp
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean rule to remove compiled files

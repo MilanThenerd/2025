@@ -3,29 +3,29 @@
 template<int n , int m>
 Matrix<n,m>::Matrix()
 {
-  data = new double*[n];
+  arr = new double*[n];
   for(int i = 0 ; i < n ; i++)
   {
-    data[i] = new double[m]();
+    arr[i] = new double[m]();
   }
 }
 
 template<int n , int m>
 Matrix<n,m>::Matrix(double** other)
 {
-  data = other;
+  arr = other;
 }
 
 template<int n , int m>
 Matrix<n,m>::Matrix(const Matrix<n,m>& other)
 {
-  data = new double*[n];
+  arr = new double*[n];
   for(int i = 0 ; i < n ; i++)
   {
-    data[i] = new double[m];
+    arr[i] = new double[m];
     for(int j = 0 ; j < m ; j++)
     {
-      data[i][j] = other.data[i][j];
+      arr[i][j] = other.arr[i][j];
     }
   }
 }
@@ -35,9 +35,9 @@ Matrix<n,m>::~Matrix()
 {
   for(int i = 0 ; i < n ; i++)
   {
-    delete[] data[i];
+    delete[] arr[i];
   }
-  delete[] data;
+  delete[] arr;
 }
 
 template<int n , int m>
@@ -49,17 +49,17 @@ Matrix<n,m>& Matrix<n,m>::operator=(const Matrix<n,m>& other)
   }
   for(int i = 0 ; i < n ; i++)
   {
-    delete[] data[i];
+    delete[] arr[i];
   }
-  delete[] data;
+  delete[] arr;
 
-  data = new double*[n];
+  arr = new double*[n];
   for(int i = 0 ; i < n ; i++)
   {
-    data[i] = new double[m];
+    arr[i] = new double[m];
     for(int j = 0 ; j < m ; j++)
     {
-      data[i][j] = other.data[i][j];
+      arr[i][j] = other.arr[i][j];
     }
   }
   return *this;
@@ -91,7 +91,7 @@ Matrix<n,m> Matrix<n,m>::operator*(double scalar) const
   {
     for(int j = 0 ; j < n ; j++)
     {
-      data[i][j] *= scalar;
+      arr[i][j] *= scalar;
     }
   }
 }
@@ -99,12 +99,12 @@ Matrix<n,m> Matrix<n,m>::operator*(double scalar) const
 template<int n, int m>
 Matrix<n,m> Matrix<n,m>::operator+(const Matrix<n,m> other) const
 {
-  Matrix<n,a> result;
+  Matrix<n,m> result;
   for(int i = 0; i < n; i++)
   {
     for(int j = 0; j < m; j++)
     {
-      result[i][j] = data[i][j] + other.data[i][j];
+      result[i][j] = arr[i][j] + other.arr[i][j];
     }
   }
   return result;
@@ -115,9 +115,9 @@ Matrix<m,n> Matrix<n,m>::operator~() const
 {
   for(int i = 0; i < n; i++)
   {
-    delete data[i];
+    delete arr[i];
   }
-  delete[] data;
+  delete[] arr;
 }
 
 template<int n , int m>
@@ -135,10 +135,10 @@ int Matrix<n,m>::getM() const
 template <int n>
 SquareMatrix<n>::SquareMatrix()
 {
-  arr = new double*[n];
+  this->arr = new double*[n];
   for(int i = 0; i < n; i++)
   {
-    arr[i] = new double[n]();
+    this->arr[i] = new double[n]();
   }
 }
 
@@ -147,9 +147,9 @@ SquareMatrix<n>::~SquareMatrix()
 {
   for(int i = 0; i < n; i++)
   {
-    delete[] arr[i];
+    delete[] this->arr[i];
   }
-  delete[] arr;
+  delete[] this->arr;
 }
 
 #include <array>
@@ -201,6 +201,49 @@ Vector<n> SquareMatrix<n>::solve(const Vector<n> t) const
     x[i] /= A[i][i];
   }
   return x;
+}
+
+template<int n>
+double SquareMatrix<n>::determinant() const
+{
+    Matrix<n, n> A = *this; // Copy the matrix
+    double det = 1;
+    
+    for (int i = 0; i < n; i++)
+    {
+        // Pivot selection (find the maximum absolute value in the column)
+        int pivot = i;
+        for (int j = i + 1; j < n; j++)
+        {
+            if (std::abs(A[j][i]) > std::abs(A[pivot][i]))
+                pivot = j;
+        }
+
+        // If the pivot is zero, determinant is zero
+        if (A[pivot][i] == 0)
+            return 0;
+
+        // Swap rows if needed
+        if (pivot != i)
+        {
+            std::swap(A[i], A[pivot]);
+            det *= -1; // Row swap changes the determinant's sign
+        }
+
+        // Multiply determinant by the pivot element
+        det *= A[i][i];
+
+        // Perform row operations to create upper triangular form
+        for (int j = i + 1; j < n; j++)
+        {
+            double factor = A[j][i] / A[i][i];
+            for (int k = i; k < n; k++)
+            {
+                A[j][k] -= factor * A[i][k];
+            }
+        }
+    }
+    return det;
 }
 
 

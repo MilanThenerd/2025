@@ -1,5 +1,6 @@
 #include "Vector.h"
 #include <cmath>
+
 template <int n>
 Vector<n>::Vector() 
 {
@@ -9,8 +10,12 @@ Vector<n>::Vector()
 template <int n>
 Vector<n>::Vector(double* inputData) 
 {
-    arr = inputData;
+  arr = new double[n];
+  for (int i = 0; i < n; i++) {
+      arr[i] = inputData[i];
+  }
 }
+
 
 template <int n>
 Vector<n>::Vector(const Matrix<n , 1>& matrix) 
@@ -147,14 +152,4 @@ Vector<3> Vector<n>::crossProduct(const Vector<3> other) const
   result.arr[1] = arr[2] * other.arr[0] - arr[0] * other.arr[2];
   result.arr[2] = arr[0] * other.arr[1] - arr[1] * other.arr[0];
   return result;
-}
-
-template <int n>
-Vector<n>::operator Matrix<n,1>() const 
-{
-  Matrix<n,1> matrix;
-  for (int i = 0; i < n; i++) {
-      matrix(i, 0) = data[i];
-  }
-  return matrix;
 }
