@@ -1,22 +1,17 @@
 #!/usr/bin/env python3
 import datetime
 
-# Path to the back-end file
 backend_file = "/usr/lib/cgi-bin/backend.txt"
 
-# Read the time zone data from the file
 with open(backend_file, 'r') as file:
-    first_line = file.readline().strip()  # Read only the first line
+    first_line = file.readline().strip()
 
-# Extract values: offset, country, city
-offset, country, city = first_line.split(',')  # Split by comma
-offset = int(offset)  # Convert the offset to an integer
+offset, country, city = first_line.split(',')
+offset = int(offset)
 
-# Get the current time adjusted for the timezone offset
 current_time = datetime.datetime.utcnow() + datetime.timedelta(hours=offset)
 formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
-# Output the HTML response
 print("Content-Type: text/html\n")
 print(f"<!DOCTYPE html>")
 print(f"<html lang='en'>")
