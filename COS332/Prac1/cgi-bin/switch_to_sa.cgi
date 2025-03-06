@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-# Path to the back-end file
 backend_file = "/usr/lib/cgi-bin/backend.txt"
 
-# Set the time zone offset to 0 (Ghana)
 with open(backend_file, 'w') as file:
     file.write("2,South Africa,Pretoria")
 
-# Output the HTML
 print("Content-Type: text/html\n")
 print(f"<!DOCTYPE html>")
 print(f"<html lang='en'>")
