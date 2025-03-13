@@ -1,0 +1,286 @@
+:root {
+  --app-primary: #9a02ff;
+  --app-secondary: #560bad;
+
+  --text-primary: #eff3fc;
+
+  --button-primary: #eff3fc;
+  --button-secondary: #da48b1;
+  --button-text-primary: #6d2480;
+}
+
+.darkMode {
+  --app-primary: #1A1F16;
+  --app-secondary: #1e3f20;
+
+  --text-primary: #94ecbe;
+
+  --button-primary: #94ecbe;
+  --button-secondary: #345830;
+  --button-text-primary: #4a7856;
+}
+
+.appContainer {
+  display: flex;
+  height: 100%;
+  min-height: 100vh;
+
+  background: linear-gradient(45deg, var(--app-primary), var(--app-secondary));
+  border-radius: 16px;
+
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: bold;
+}
+
+.sidebar {
+  width: 250px;
+  padding: 15px;
+  margin: 10px 0;
+
+  background: transparent;
+  border: 2px solid rgba(255,255,255,.1);
+  backdrop-filter: blur(30px);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+
+  margin-left: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+
+  color: var(--text-primary);
+}
+
+
+.sidebarTitle {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.tableList {
+  list-style: none;
+  padding: 0;
+}
+
+.tableItem {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  position: relative;
+}
+
+.tableItemHover {
+  background-color: var(--button-secondary);
+  transform: scale(1.05);
+}
+
+.tableItemSelected {
+  background-color: var(--button-secondary);
+  font-weight: bold;
+}
+
+.tableColumns {
+  font-size: 12px;
+}
+
+.addTableButton {
+  width: 100%;
+  padding: 12px;
+
+  background-color: var(--button-primary);
+  color: var(--button-text-primary);
+
+  border: none;
+  border-radius: 5px;
+
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggleButton {
+  width: 100%;
+  padding: 10px;
+
+  background-color: var(--button-primary);
+  color: var(--button-text-primary);
+
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.addTableButton:hover,
+.toggleButton:hover {
+  background-color: var(--button-secondary);
+}
+
+.mainContent {
+  flex: 1;
+}
+
+.tableContainer {
+  padding: 15px;
+  margin: 10px;
+
+  background: transparent;
+  border: 2px solid rgba(255,255,255,.1);
+  backdrop-filter: blur(30px);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+
+  transition: transform 0.2s ease;
+
+  color: var(--text-primary);
+}
+
+.tableTitle {
+  font-size: 24px;
+
+  color: var(--text-primary);
+
+  margin-bottom: 20px;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.actionButton {
+  padding: 10px 20px;
+
+  background-color: var(--button-primary);
+  color: var(--button-text-primary);
+
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.actionButton:hover {
+  background-color: var(--button-secondary);
+}
+
+.dataTable {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+.tableHeader {
+  background-color: var(--button-secondary);
+  padding: 12px;
+  text-align: left;
+}
+
+.tableCell {
+  padding: 12px;
+}
+
+.updateButton,
+.deleteButton {
+  padding: 6px 12px;
+
+  background-color: var(--button-primary);
+  color: var(--button-text-primary);
+
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.updateButton:hover,
+.deleteButton:hover {
+  background-color: var(--button-secondary);
+}
+
+.errorMessage {
+  font-size: 18px;
+  color: var(--button-secondary);
+}
+
+.inputField {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  
+  background: transparent;
+  border: 2px solid rgba(255,255,255,.1);
+  backdrop-filter: blur(30px);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+  outline: none;
+  color: var(--text-primary);
+
+  box-sizing: border-box;
+}
+
+select.inputField {
+  color: var(--text-primary);
+  background-color: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select.inputField option {
+  background-color: var(--button-primary);
+  color: var(--button-text-primary);
+}
+
+select.inputField {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+::placeholder {
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: bold;
+}
+
+.columnInputGroup {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.addColumnButton,
+.createButton,
+.cancelButton,
+.fileInput {
+  padding: 10px 20px;
+
+  background-color: var(--button-primary);
+  color: var(--button-text-primary);
+
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.addColumnButton:hover,
+.createButton:hover,
+.cancelButton:hover {
+  background-color: var(--button-secondary);
+}
+
+.fileInput::file-selector-button {
+  background-color: var(--button-primary);
+  color: var(--button-text-primary);
+  border: none;
+}
