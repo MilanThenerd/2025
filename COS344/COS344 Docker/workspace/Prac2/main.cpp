@@ -101,7 +101,7 @@ public:
   GLfloat x = 0.0f, y = 0.0f;
   float rotationAngle = 0.0f;
   float scaleX = 1.0f, scaleY = 1.0f;
-
+  bool isSelected = false;
   GLuint VAO = 0, VBO = 0, CBO = 0;
   int vertexCount = 0;
 
@@ -111,8 +111,8 @@ public:
   {
     for (int i = 0; i < vCount * 3; i++)
     {
-      vertices[i] = v[i];            // Store original positions
-      transformedVertices[i] = v[i]; // Initial transformed state
+      vertices[i] = v[i];
+      transformedVertices[i] = v[i];
       colors[i] = c[i];
     }
   }
@@ -174,7 +174,6 @@ public:
       GLfloat rotatedX = localX * cosTheta - localY * sinTheta;
       GLfloat rotatedY = localX * sinTheta + localY * cosTheta;
 
-      // Update transformed vertices
       transformedVertices[i] = rotatedX + centerX + x;
       transformedVertices[i + 1] = rotatedY + centerY + y;
       transformedVertices[i + 2] = vertices[i + 2];
@@ -212,6 +211,19 @@ public:
   void draw() override
   {
     glBindVertexArray(VAO);
+
+    if (isSelected)
+    {
+      GLfloat pastelColor[1000];
+      getColor(1.0f, 0.9f, 0.7f, vertexCount, pastelColor);
+      glBindBuffer(GL_ARRAY_BUFFER, CBO);
+      glBufferData(GL_ARRAY_BUFFER, vertexCount * 3 * sizeof(GLfloat), pastelColor, GL_STATIC_DRAW);
+    }
+    else
+    {
+      glBindBuffer(GL_ARRAY_BUFFER, CBO);
+      glBufferData(GL_ARRAY_BUFFER, vertexCount * 3 * sizeof(GLfloat), colors, GL_STATIC_DRAW);
+    }
     if (wireframeMode)
     {
       glDrawArrays(GL_LINE_LOOP, 0, vertexCount);
@@ -231,6 +243,18 @@ public:
   void draw() override
   {
     glBindVertexArray(VAO);
+    if (isSelected)
+    {
+      GLfloat pastelColor[1000];
+      getColor(1.0f, 0.9f, 0.7f, vertexCount, pastelColor);
+      glBindBuffer(GL_ARRAY_BUFFER, CBO);
+      glBufferData(GL_ARRAY_BUFFER, vertexCount * 3 * sizeof(GLfloat), pastelColor, GL_STATIC_DRAW);
+    }
+    else
+    {
+      glBindBuffer(GL_ARRAY_BUFFER, CBO);
+      glBufferData(GL_ARRAY_BUFFER, vertexCount * 3 * sizeof(GLfloat), colors, GL_STATIC_DRAW);
+    }
     if (wireframeMode)
     {
       glDrawArrays(GL_LINE_LOOP, 0, 3);
@@ -251,6 +275,18 @@ public:
   void draw() override
   {
     glBindVertexArray(VAO);
+    if (isSelected)
+    {
+      GLfloat pastelColor[1000];
+      getColor(1.0f, 0.9f, 0.7f, vertexCount, pastelColor);
+      glBindBuffer(GL_ARRAY_BUFFER, CBO);
+      glBufferData(GL_ARRAY_BUFFER, vertexCount * 3 * sizeof(GLfloat), pastelColor, GL_STATIC_DRAW);
+    }
+    else
+    {
+      glBindBuffer(GL_ARRAY_BUFFER, CBO);
+      glBufferData(GL_ARRAY_BUFFER, vertexCount * 3 * sizeof(GLfloat), colors, GL_STATIC_DRAW);
+    }
     if (wireframeMode)
     {
       for (int i = 0; i <= vertexCount; i++)
@@ -265,18 +301,56 @@ public:
   }
 };
 
+class EntryDoor : public Square
+{
+public:
+  EntryDoor() {}
+  EntryDoor(GLfloat *v, GLfloat *c, int vCount) : Square(v, c, vCount) {}
+};
+
+class Counter : public Square
+{
+public:
+  Counter() {}
+  Counter(GLfloat *v, GLfloat *c, int vCount) : Square(v, c, vCount) {}
+};
+
+class Bench : public Square
+{
+public:
+  Bench() {}
+  Bench(GLfloat *v, GLfloat *c, int vCount) : Square(v, c, vCount) {}
+};
+
+class Dustbin : public Triangle
+{
+public:
+  Dustbin() {}
+  Dustbin(GLfloat *v, GLfloat *c, int vCount) : Triangle(v, c, vCount) {}
+};
+
 const int maxDoors = 10;
 const int maxPlants = 10;
 const int maxPosts = 10;
 const int maxTables = 10;
 const int maxSeating = 10;
+const int maxEntryDoors = 2;
+const int maxCounters = 1;
+const int maxBenches = 3;
+const int maxDustbins = 2;
 
 Square doors[maxDoors];
 Triangle plants[maxPlants];
 Square posts[maxPosts];
 Square tables[maxTables];
 Circle seating[maxSeating];
+EntryDoor entryDoors[maxEntryDoors];
+Counter counters[maxCounters];
+Bench benches[maxBenches];
+Dustbin dustbins[maxDustbins];
+
 int doorCount = 0, plantCount = 0, postCount = 0, tableCount = 0, seatingCount = 0;
+int entryDoorCount = 0, counterCount = 0, benchCount = 0, dustbinCount = 0;
 
 bool isDragging = false;
 double lastX, lastY;
@@ -329,27 +403,47 @@ void saveLayout(const std::string &filename)
   for (int i = 0; i < doorCount; i++)
   {
     file << "Doors " << doors[i].x << " " << doors[i].y << " "
-         << doors[i].rotationAngle << " " << doors[i].scaleX << " " << doors[i].scaleY << "\n";
+         << doors[i].rotationAngle << " " << doors[i].scaleX << " " << doors[i].scaleY << " " << doors[i].vertexCount <<  "\n";
   }
   for (int i = 0; i < plantCount; i++)
   {
     file << "Plants " << plants[i].x << " " << plants[i].y << " "
-         << plants[i].rotationAngle << " " << plants[i].scaleX << " " << plants[i].scaleY << "\n";
+         << plants[i].rotationAngle << " " << plants[i].scaleX << " " << plants[i].scaleY << " " << plants[i].vertexCount << "\n";
   }
   for (int i = 0; i < tableCount; i++)
   {
     file << "Tables " << tables[i].x << " " << tables[i].y << " "
-         << tables[i].rotationAngle << " " << tables[i].scaleX << " " << tables[i].scaleY << "\n";
+         << tables[i].rotationAngle << " " << tables[i].scaleX << " " << tables[i].scaleY << " " << tables[i].vertexCount <<"\n";
   }
   for (int i = 0; i < seatingCount; i++)
   {
     file << "Seating " << seating[i].x << " " << seating[i].y << " "
-         << seating[i].rotationAngle << " " << seating[i].scaleX << " " << seating[i].scaleY << "\n";
+         << seating[i].rotationAngle << " " << seating[i].scaleX << " " << seating[i].scaleY << " " << seating[i].vertexCount << "\n";
   }
   for (int i = 0; i < postCount; i++)
   {
     file << "Posts " << posts[i].x << " " << posts[i].y << " "
-         << posts[i].rotationAngle << " " << posts[i].scaleX << " " << posts[i].scaleY << "\n";
+         << posts[i].rotationAngle << " " << posts[i].scaleX << " " << posts[i].scaleY << " " << posts[i].vertexCount << "\n";
+  }
+  for (int i = 0; i < entryDoorCount; i++)
+  {
+    file << "EntryDoors " << entryDoors[i].x << " " << entryDoors[i].y << " "
+         << entryDoors[i].rotationAngle << " " << entryDoors[i].scaleX << " " << entryDoors[i].scaleY << " " << entryDoors[i].vertexCount << "\n";
+  }
+  for (int i = 0; i < counterCount; i++)
+  {
+    file << "Counters " << counters[i].x << " " << counters[i].y << " "
+         << counters[i].rotationAngle << " " << counters[i].scaleX << " " << counters[i].scaleY << " " << counters[i].vertexCount << "\n";
+  }
+  for (int i = 0; i < benchCount; i++)
+  {
+    file << "Benches " << benches[i].x << " " << benches[i].y << " "
+         << benches[i].rotationAngle << " " << benches[i].scaleX << " " << benches[i].scaleY << " " << benches[i].vertexCount << "\n";
+  }
+  for (int i = 0; i < dustbinCount; i++)
+  {
+    file << "Dustbins " << dustbins[i].x << " " << dustbins[i].y << " "
+         << dustbins[i].rotationAngle << " " << dustbins[i].scaleX << " " << dustbins[i].scaleY << " " << dustbins[i].vertexCount << "\n";
   }
 
   file.close();
@@ -365,15 +459,19 @@ void loadLayout(const std::string &filename)
   }
 
   string shapeType;
-  float x, y, rotation, scaleX, scaleY;
+  float x, y, rotation, scaleX, scaleY ,vertexCount;
 
   doorCount = 0;
   plantCount = 0;
   tableCount = 0;
   seatingCount = 0;
   postCount = 0;
+  entryDoorCount = 0;
+  counterCount = 0;
+  benchCount = 0;
+  dustbinCount = 0;
 
-  while (file >> shapeType >> x >> y >> rotation >> scaleX >> scaleY)
+  while (file >> shapeType >> x >> y >> rotation >> scaleX >> scaleY >> vertexCount)
   {
     if (shapeType == "Doors" && doorCount < maxDoors)
     {
@@ -413,11 +511,12 @@ void loadLayout(const std::string &filename)
     }
     else if (shapeType == "Seating" && seatingCount < maxSeating)
     {
-      GLfloat seatingVertices[3 * 52];
-      createCircle(50, 0.1f, seatingVertices);
-      GLfloat seatingColors[3 * 52];
-      getColor(0.5f, 0.0f, 0.5f, 52, seatingColors);
-      seating[seatingCount] = Circle(seatingVertices, seatingColors, 52);
+      int count = 3 * vertexCount;
+      GLfloat seatingVertices[count];
+      createCircle(vertexCount - 2, 0.1f, seatingVertices);
+      GLfloat seatingColors[count];
+      getColor(0.5f, 0.0f, 0.5f, vertexCount, seatingColors);
+      seating[seatingCount] = Circle(seatingVertices, seatingColors, vertexCount);
       seating[seatingCount].move(x, y);
       seating[seatingCount].rotate(rotation);
       seating[seatingCount].scale(scaleX, scaleY);
@@ -436,6 +535,54 @@ void loadLayout(const std::string &filename)
       tables[tableCount].upload();
       tableCount++;
     }
+    else if (shapeType == "EntryDoors" && entryDoorCount < maxEntryDoors)
+    {
+      GLfloat entryDoorVertices[] = {-0.2f, -0.8f, 0.0f, 0.2f, -0.8f, 0.0f, -0.2f, -0.7f, 0.0f, 0.2f, -0.7f, 0.0f};
+      GLfloat entryDoorColors[12];
+      getColor(0.5f, 0.5f, 0.5f, 4, entryDoorColors);
+      entryDoors[entryDoorCount] = EntryDoor(entryDoorVertices, entryDoorColors, 4);
+      entryDoors[entryDoorCount].move(x, y);
+      entryDoors[entryDoorCount].rotate(rotation);
+      entryDoors[entryDoorCount].scale(scaleX, scaleY);
+      entryDoors[entryDoorCount].upload();
+      entryDoorCount++;
+    }
+    else if (shapeType == "Counters" && counterCount < maxCounters)
+    {
+      GLfloat counterVertices[] = {-0.3f, 0.6f, 0.0f, 0.3f, 0.6f, 0.0f, -0.3f, 0.7f, 0.0f, 0.3f, 0.7f, 0.0f};
+      GLfloat counterColors[12];
+      getColor(0.0f, 0.0f, 1.0f, 4, counterColors);
+      counters[counterCount] = Counter(counterVertices, counterColors, 4);
+      counters[counterCount].move(x, y);
+      counters[counterCount].rotate(rotation);
+      counters[counterCount].scale(scaleX, scaleY);
+      counters[counterCount].upload();
+      counterCount++;
+    }
+    else if (shapeType == "Benches" && benchCount < maxBenches)
+    {
+      GLfloat benchVertices[] = {-0.2f, 0.4f, 0.0f, 0.2f, 0.4f, 0.0f, -0.2f, 0.5f, 0.0f, 0.2f, 0.5f, 0.0f};
+      GLfloat benchColors[12];
+      getColor(0.5f, 0.3f, 0.1f, 4, benchColors);
+      benches[benchCount] = Bench(benchVertices, benchColors, 4);
+      benches[benchCount].move(x, y);
+      benches[benchCount].rotate(rotation);
+      benches[benchCount].scale(scaleX, scaleY);
+      benches[benchCount].upload();
+      benchCount++;
+    }
+    else if (shapeType == "Dustbins" && dustbinCount < maxDustbins)
+    {
+      GLfloat dustbinVertices[] = {-0.05f, -0.05f, 0.0f, 0.05f, -0.05f, 0.0f, -0.05f, 0.05f, 0.0f, 0.05f, 0.05f, 0.0f};
+      GLfloat dustbinColors[12];
+      getColor(0.3f, 0.3f, 0.3f, 4, dustbinColors);
+      dustbins[dustbinCount] = Dustbin(dustbinVertices, dustbinColors, 4);
+      dustbins[dustbinCount].move(x, y);
+      dustbins[dustbinCount].rotate(rotation);
+      dustbins[dustbinCount].scale(scaleX, scaleY);
+      dustbins[dustbinCount].upload();
+      dustbinCount++;
+    }
   }
 
   file.close();
@@ -444,11 +591,50 @@ void loadLayout(const std::string &filename)
 void handleKeyPresses(GLFWwindow *window, int &type, int &index,
                       Square doors[], int doorCount, Triangle plants[], int plantCount,
                       Square posts[], int postCount, Square tables[], int tableCount,
-                      Circle seating[], int seatingCount, double &lastKeyPressTime, const double keyPressCooldown)
+                      Circle seating[], int seatingCount, EntryDoor entryDoors[], int entryDoorCount,
+                      Counter counters[], int counterCount, Bench benches[], int benchCount,
+                      Dustbin dustbins[], int dustbinCount, double &lastKeyPressTime, const double keyPressCooldown)
 {
   double currentTime = glfwGetTime();
   if (currentTime - lastKeyPressTime >= keyPressCooldown)
   {
+    for (int i = 0; i < doorCount; i++)
+      doors[i].isSelected = false;
+    for (int i = 0; i < plantCount; i++)
+      plants[i].isSelected = false;
+    for (int i = 0; i < postCount; i++)
+      posts[i].isSelected = false;
+    for (int i = 0; i < tableCount; i++)
+      tables[i].isSelected = false;
+    for (int i = 0; i < seatingCount; i++)
+      seating[i].isSelected = false;
+    for (int i = 0; i < entryDoorCount; i++)
+      entryDoors[i].isSelected = false;
+    for (int i = 0; i < counterCount; i++)
+      counters[i].isSelected = false;
+    for (int i = 0; i < benchCount; i++)
+      benches[i].isSelected = false;
+    for (int i = 0; i < dustbinCount; i++)
+      dustbins[i].isSelected = false;
+
+    if (type == 1 && index < doorCount)
+      doors[index].isSelected = true;
+    else if (type == 2 && index < plantCount)
+      plants[index].isSelected = true;
+    else if (type == 3 && index < postCount)
+      posts[index].isSelected = true;
+    else if (type == 4 && index < tableCount)
+      tables[index].isSelected = true;
+    else if (type == 5 && index < seatingCount)
+      seating[index].isSelected = true;
+    else if (type == 6 && index < entryDoorCount)
+      entryDoors[index].isSelected = true;
+    else if (type == 7 && index < counterCount)
+      counters[index].isSelected = true;
+    else if (type == 8 && index < benchCount)
+      benches[index].isSelected = true;
+    else if (type == 9 && index < dustbinCount)
+      dustbins[index].isSelected = true;
     if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
     {
       type = 0;
@@ -457,58 +643,88 @@ void handleKeyPresses(GLFWwindow *window, int &type, int &index,
     }
     else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {
-      type = 1;
-      index = (index + 1) % doorCount;
+      type = 8;
+      index = (index + 1) % benchCount;
+      benches[index].isSelected = true;
       lastKeyPressTime = currentTime;
     }
     else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
     {
-      type = 2;
-      index = (index + 1) % plantCount;
+      type = 5;
+      index = (index + 1) % seatingCount;
+      seating[index].isSelected = true;
       lastKeyPressTime = currentTime;
     }
     else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
     {
-      type = 3;
-      index = (index + 1) % postCount;
+      type = 2;
+      index = (index + 1) % plantCount;
+      plants[index].isSelected = true;
       lastKeyPressTime = currentTime;
     }
     else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
     {
       type = 4;
       index = (index + 1) % tableCount;
+      tables[index].isSelected = true;
       lastKeyPressTime = currentTime;
     }
     else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
     {
-      type = 5;
-      index = (index + 1) % seatingCount;
+      type = 1;
+      index = (index + 1) % doorCount;
+      doors[index].isSelected = true;
+      lastKeyPressTime = currentTime;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+    {
+      type = 3;
+      index = (index + 1) % postCount;
+      posts[index].isSelected = true;
+      lastKeyPressTime = currentTime;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
+    {
+      type = 6;
+      index = (index + 1) % entryDoorCount;
+      entryDoors[index].isSelected = true;
       lastKeyPressTime = currentTime;
     }
     else if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
     {
-      saveLayout("stuff.txt");
+      type = 7;
+      index = (index + 1) % counterCount;
+      counters[index].isSelected = true;
       lastKeyPressTime = currentTime;
     }
     else if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS)
     {
-      loadLayout("stuff.txt");
+      type = 9;
+      index = (index + 1) % dustbinCount;
+      dustbins[index].isSelected = true;
       lastKeyPressTime = currentTime;
     }
     else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
     {
       wireframeMode = !wireframeMode;
-      cout << "Wireframe Mode: " << (wireframeMode ? "ON" : "OFF") << endl;
+      lastKeyPressTime = currentTime;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+    {
+      saveLayout("layout.txt");
+      lastKeyPressTime = currentTime;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+    {
+      loadLayout("layout.txt");
       lastKeyPressTime = currentTime;
     }
   }
 }
-
 int main()
 {
-  GLFWwindow *window = setUp(1000, 1000, 0.9f, 0.9f, 0.9f, 1.0f);
+  GLFWwindow *window = setUp(1000, 1000, 0.3f, 0.3f, 0.3f, 1.0f);
   GLuint programID = LoadShaders("vertex.glsl", "fragment.glsl");
-
   GLuint VertexArrayID;
   glGenVertexArrays(1, &VertexArrayID);
   glBindVertexArray(VertexArrayID);
@@ -548,14 +764,49 @@ int main()
   createCircle(50, 0.1f, seatingVertices);
   GLfloat seatingColors[3 * 52];
   getColor(0.5f, 0.0f, 0.5f, 52, seatingColors);
-
   seating[seatingCount++] = Circle(seatingVertices, seatingColors, 52);
+
+  GLfloat seatingVerticesLow[3 * (12)];
+  createCircle(10, 0.1f, seatingVerticesLow);
+  GLfloat seatingColorsLow[3 * 12];
+  getColor(0.5f, 0.0f, 0.5f, 12, seatingColorsLow);
+  seating[seatingCount++] = Circle(seatingVerticesLow, seatingColorsLow, 12);
+
+  GLfloat entryDoorVertices[] = {-0.2f, -0.8f, 0.0f, 0.2f, -0.8f, 0.0f, -0.2f, -0.7f, 0.0f, 0.2f, -0.7f, 0.0f};
+  GLfloat entryDoorColors[12];
+  getColor(0.5f, 0.5f, 0.5f, 4, entryDoorColors);
+  entryDoors[entryDoorCount++] = EntryDoor(entryDoorVertices, entryDoorColors, 4);
+  entryDoors[entryDoorCount - 1].move(-0.5f, 0.0f);
+
+  GLfloat counterVertices[] = {-0.3f, 0.6f, 0.0f, 0.3f, 0.6f, 0.0f, -0.3f, 0.7f, 0.0f, 0.3f, 0.7f, 0.0f};
+  GLfloat counterColors[12];
+  getColor(0.0f, 0.0f, 1.0f, 4, counterColors);
+  counters[counterCount++] = Counter(counterVertices, counterColors, 4);
+
+  GLfloat benchVertices[] = {-0.2f, 0.4f, 0.0f, 0.2f, 0.4f, 0.0f, -0.2f, 0.5f, 0.0f, 0.2f, 0.5f, 0.0f};
+  GLfloat benchColors[12];
+  getColor(0.5f, 0.3f, 0.1f, 4, benchColors);
+  for (int i = 0; i < maxBenches; i++)
+  {
+    benches[benchCount++] = Bench(benchVertices, benchColors, 4);
+    benches[benchCount - 1].move(0.0f, -0.2f * i);
+  }
+
+  GLfloat dustbinVertices[] = {-0.05f, -0.05f, 0.0f, 0.05f, -0.05f, 0.0f, -0.05f, 0.05f, 0.0f, 0.05f, 0.05f, 0.0f};
+  GLfloat dustbinColors[12];
+  getColor(0.3f, 0.3f, 0.3f, 4, dustbinColors);
+  for (int i = 0; i < maxDustbins; i++)
+  {
+    dustbins[dustbinCount++] = Dustbin(dustbinVertices, dustbinColors, 4);
+    dustbins[dustbinCount - 1].move(0.6f, -0.6f + 0.2f * i);
+  }
 
   int type = 0;
   int index = 0;
 
   double lastKeyPressTime = 0.0;
   const double keyPressCooldown = 0.5;
+  loadLayout("layout.txt");
   do
   {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -587,78 +838,69 @@ int main()
       seat.upload();
       seat.draw();
     }
-
-    for (int i = 0; i < doorCount; i++)
+    for (auto &entryDoor : entryDoors)
     {
-      GLfloat doorColors[12];
-      getColor(0.5f, 0.5f, 0.5f, 4, doorColors);
-      doors[i].setColor(doorColors);
+      entryDoor.upload();
+      entryDoor.draw();
     }
-    for (int i = 0; i < plantCount; i++)
+    for (auto &counter : counters)
     {
-      GLfloat doorColors[9];
-      getColor(0.0f, 1.0f, 0.0f, 3, doorColors);
-      plants[i].setColor(doorColors);
+      counter.upload();
+      counter.draw();
     }
-    for (int i = 0; i < postCount; i++)
+    for (auto &bench : benches)
     {
-      GLfloat postColors[12];
-      getColor(0.5f, 0.5f, 0.5f, 4, postColors);
-      posts[i].setColor(postColors);
+      bench.upload();
+      bench.draw();
     }
-    for (int i = 0; i < tableCount; i++)
+    for (auto &dustbin : dustbins)
     {
-      GLfloat tableColors[12];
-      getColor(0.0f, 0.0f, 1.0f, 4, tableColors);
-      tables[i].setColor(tableColors);
-    }
-    for (int i = 0; i < seatingCount; i++)
-    {
-      GLfloat seatingColors[52 * 3];
-      getColor(0.5f, 0.0f, 0.5f, 52, seatingColors);
-      seating[i].setColor(seatingColors);
+      dustbin.upload();
+      dustbin.draw();
     }
 
     if (type == 1 && index < doorCount)
     {
-      GLfloat doorColors[12];
-      getColor(0.8f, 0.8f, 0.8f, 4, doorColors);
-      doors[index].setColor(doorColors);
       handleMovement(&doors[index], window);
     }
     else if (type == 2 && index < plantCount)
     {
-      GLfloat plantColors[9];
-      getColor(0.6f, 1.0f, 0.6f, 3, plantColors);
-      plants[index].setColor(plantColors);
       handleMovement(&plants[index], window);
     }
     else if (type == 3 && index < postCount)
     {
-      GLfloat postColors[12];
-      getColor(0.8f, 0.8f, 0.8f, 4, postColors);
-      posts[index].setColor(postColors);
       handleMovement(&posts[index], window);
     }
     else if (type == 4 && index < tableCount)
     {
-      GLfloat tableColors[12];
-      getColor(0.6f, 0.6f, 1.0f, 4, tableColors);
-      tables[index].setColor(tableColors);
       handleMovement(&tables[index], window);
     }
     else if (type == 5 && index < seatingCount)
     {
-      GLfloat seatingColors[52 * 3];
-      getColor(0.8f, 0.8f, 0.8f, 52 * 3, seatingColors);
-      seating[index].setColor(seatingColors);
       handleMovement(&seating[index], window);
     }
+    else if (type == 6 && index < entryDoorCount)
+    {
+      handleMovement(&entryDoors[index], window);
+    }
+    else if (type == 7 && index < counterCount)
+    {
+      handleMovement(&counters[index], window);
+    }
+    else if (type == 8 && index < benchCount)
+    {
+      handleMovement(&benches[index], window);
+    }
+    else if (type == 9 && index < dustbinCount)
+    {
+      handleMovement(&dustbins[index], window);
+    }
+
     glfwSwapBuffers(window);
     glfwPollEvents();
-    handleKeyPresses(window, type, index, doors, doorCount, plants, plantCount, posts, postCount, tables, tableCount, seating, seatingCount, lastKeyPressTime, keyPressCooldown);
+    handleKeyPresses(window, type, index, doors, doorCount, plants, plantCount, posts, postCount, tables, tableCount, seating, seatingCount, entryDoors, entryDoorCount, counters, counterCount, benches, benchCount, dustbins, dustbinCount, lastKeyPressTime, keyPressCooldown);
   } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && !glfwWindowShouldClose(window));
-
+  saveLayout("layout.txt");
   glfwTerminate();
   return 0;
 }

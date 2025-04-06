@@ -1,0 +1,9 @@
+dn: ou=Friends,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Friends
+
+dn: cn=John Doe,ou=Friends,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: John Doe
+sn: Doe
+telephoneNumber: +27 12 345 6789
