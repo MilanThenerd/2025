@@ -1,0 +1,202 @@
+name: Create Docker Image
+run-name: ${{ gitea.actor }} Building Docker Image 🐳
+on: [push]
+env:
+  DOCKER_HOST: tcp://127.0.0.1:2375
+  ASSETS: c2780a3
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        arch:
+        - x86_64
+        # arm64
+
+    name: Test Application
+    runs-on: docker-${{ matrix.arch }}
+    container:
+      image: docker:dind
+      privileged: true
+
+    steps:
+    - name: Environment Setup
+      run: |
+        # If we have a proxy use it
+        if [ -n "${HTTP_PROXY}" ]; then echo "HTTP PROXY [${HTTP_PROXY}]"; sed -i -e s'/https/http/' /etc/apk/repositories; fi
+        # Some pre-reqs
+        apk add git nodejs npm tar zstd
+        ## Some debugging info
+        # env|sort
+
+    - name: Code Checkout
+      uses: actions/checkout@v4
+
+    - name: Build Assets
+      run: |
+        # Build assets
+        npm i
+        npm run prod
+
+#    - name: Run Tests
+#      run: |
+#        mv .env.testing .env
+#        # Install Composer and project dependencies.
+#        mkdir -p ${COMPOSER_HOME}
+#        if [ -n "${{ secrets.COMPOSER_GITHUB_TOKEN }}" ]; then composer config github-oauth.github.com ${{ secrets.COMPOSER_GITHUB_TOKEN }}; fi
+#        composer install
+#        # Generate an application key. Re-cache.
+#        php artisan key:generate
+#        php artisan migrate
+#        php artisan db:seed
+#        # run laravel tests
+#        # XDEBUG_MODE=coverage php vendor/bin/phpunit --coverage-text --colors=never
+
+    - name: Cache page assets
+      id: cache-page-assets
+      uses: actions/cache@v3
+#      env:
+#        cache-name: page-assets
+      with:
+        path: |
+          public/css/app.css
+          public/fonts
+          public/images
+          public/js/app.js
+          public/js/manifest.js
+          public/js/vendor.js
+        #key: build-pla-page-assets-${{ hashFiles('**/package-lock.json') }}
+        key: build-pla-page-assets-${{ env.ASSETS }}
+        #restore-keys: |
+        #  build-pla-page-assets-
+
+  build:
+    strategy:
+      matrix:
+        arch:
+        - x86_64
+        - arm64
+    needs: [test]
+
+    name: Build Docker Image
+    runs-on: docker-${{ matrix.arch }}
+    container:
+      image: docker:dind
+      privileged: true
+    env:
+      ARCH: ${{ matrix.arch }}
+
+    steps:
+    - name: Environment Setup
+      run: |
+        # If we have a proxy use it
+        if [ -n "${HTTP_PROXY}" ]; then echo "HTTP PROXY [${HTTP_PROXY}]"; sed -i -e s'/https/http/' /etc/apk/repositories; fi
+        # Some pre-reqs
+        apk add git curl nodejs npm tar zstd
+        # Start docker
+        ( dockerd --host=tcp://0.0.0.0:2375 --tls=false & ) && sleep 3
+        ## Some debugging info
+        # docker info && docker version
+        # env|sort
+
+    - name: Registry FQDN Setup
+      id: registry
+      run: |
+        registry=${{ github.server_url }}
+        echo "registry=${registry##http*://}" >> "$GITHUB_OUTPUT"
+
+    - name: Container Registry Login
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ steps.registry.outputs.registry }}
+        username: ${{ gitea.actor }}
+        password: ${{ secrets.PKG_WRITE_TOKEN }}
+
+    - name: Code Checkout
+      uses: actions/checkout@v4
+
+    - name: Cache page assets
+      id: cache-page-assets
+      uses: actions/cache@v3
+#      env:
+#        cache-name: page-assets
+      with:
+        path: |
+          public/css/app.css
+          public/fonts
+          public/images
+          public/js/app.js
+          public/js/manifest.js
+          public/js/vendor.js
+        #key: build-pla-page-assets-${{ hashFiles('**/package-lock.json') }}
+        key: build-pla-page-assets-${{ env.ASSETS }}
+        #restore-keys: |
+        #  build-pla-page-assets-
+
+    - if: ${{ steps.cache-page-assets.outputs.cache-hit != 'true' }}
+      name: List the state of page assets
+      continue-on-error: false
+      run: |
+        echo CACHE-MISS:${{ steps.cache-page-assets.outputs.cache-hit }}
+        ls -al public/css/
+        ls -al public/js/
+
+    - name: Record version and Delete Unnecessary files
+      id: prebuild
+      run: |
+        echo ${GITHUB_SHA::8} > VERSION
+        # [ "${GITHUB_REF_TYPE}" -eq "tag" ] && echo v${GITHUB_REF_NAME}-rel > public/VERSION
+        rm -rf .git* tests/ storage/app/test/
+        cat VERSION public/VERSION
+        # ls -al public/css/
+        # ls -al public/js/
+
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: docker/Dockerfile
+        push: true
+        tags: "${{ steps.registry.outputs.registry }}/${{ env.GITHUB_REPOSITORY }}:${{ env.GITHUB_REF_NAME }}-${{ env.ARCH }}"
+        build-args: |
+          BUILD_REVISION=${{ env.GITHUB_SHA }}
+          BUILD_VERSION=v${{ env.GITHUB_REF_NAME }}
+
+  manifest:
+    name: Final Docker Image Manifest
+    runs-on: docker-x86_64
+    container:
+      image: docker:dind
+      privileged: true
+    needs: [build]
+
+    steps:
+    - name: Environment Setup
+      run: |
+        # If we have a proxy use it
+        if [ -n "${HTTP_PROXY}" ]; then echo "HTTP PROXY [${HTTP_PROXY}]"; sed -i -e s'/https/http/' /etc/apk/repositories; fi
+        # Some pre-reqs
+        apk add git curl nodejs
+        # Start docker
+        ( dockerd --host=tcp://0.0.0.0:2375 --tls=false & ) && sleep 3
+
+    - name: Registry FQDN Setup
+      id: registry
+      run: |
+        registry=${{ github.server_url }}
+        echo "registry=${registry##http*://}" >> "$GITHUB_OUTPUT"
+
+    - name: Container Registry Login
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ steps.registry.outputs.registry }}
+        username: ${{ gitea.actor }}
+        password: ${{ secrets.PKG_WRITE_TOKEN }}
+
+    - name: Build Docker Manifest
+      run: |
+        docker manifest create ${{ steps.registry.outputs.registry }}/${{ env.GITHUB_REPOSITORY }}:${{ env.GITHUB_REF_NAME }} \
+          ${{ steps.registry.outputs.registry }}/${{ env.GITHUB_REPOSITORY }}:${{ env.GITHUB_REF_NAME }}-x86_64 \
+          ${{ steps.registry.outputs.registry }}/${{ env.GITHUB_REPOSITORY }}:${{ env.GITHUB_REF_NAME }}-arm64
+        docker manifest push --purge ${{ steps.registry.outputs.registry }}/${{ env.GITHUB_REPOSITORY }}:${{ env.GITHUB_REF_NAME }}
+        echo "Built container: ${{ steps.registry.outputs.registry }}/${{ env.GITHUB_REPOSITORY }}:${{ env.GITHUB_REF_NAME }}"

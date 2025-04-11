@@ -39,7 +39,7 @@ const TableView = ({
             <tr key={index} className="tableRow">
               {Object.values(row).map((value, i) => (
                 <td key={i} className="tableCell">
-                  {value}
+                  {typeof value === 'boolean' ? value.toString() : value}
                 </td>
               ))}
               <td className="tableCell">

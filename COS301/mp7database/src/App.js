@@ -4,6 +4,7 @@ import CreateTable from './components/createTable';
 import InsertTable from './components/insertTable';
 import UpdateTable from './components/updateTable';
 import TableView   from './components/tableView';
+import QueryTable from './components/queryTable';
 import './App.css';
 
 const App = () => {
@@ -11,9 +12,12 @@ const App = () => {
     tables,
     selectedTable,
     tableData,
+    loading,
+    error,
     showCreateTable,
     showInsertTable,
     showUpdateTable,
+    showQueryTable,
     rowToUpdate,
     hoveredTable,
     darkMode,
@@ -28,15 +32,32 @@ const App = () => {
     handleUpdateRow,
     handleSaveUpdatedRow,
     handleDeleteRow,
+    handleExecuteQuery,
     setShowCreateTable,
+    setShowQueryTable,
     setShowInsertTable,
     setShowUpdateTable,
     setSelectedTable,
+    setError,
   } = useTableManagement();
 
   return (
     <div className={`appContainer ${darkMode ? 'darkMode' : ''}`}>
-
+      {loading && (
+              <div className="loadingOverlay">
+                <div className="loadingSpinner"></div>
+                <p>Loading...</p>
+              </div>
+            )}
+            
+            {error && (
+              <div className="errorBanner">
+                {error}
+                <button onClick={() => setError(null)} className="closeError">
+                  ×
+                </button>
+              </div>
+            )}
       <div className="sidebar">
         <h2 className="sidebarTitle">Tables</h2>
         <ul className="tableList">
@@ -49,6 +70,7 @@ const App = () => {
                 setSelectedTable(table.name);
                 setShowCreateTable(false);
                 setShowInsertTable(false);
+                setShowQueryTable(false);
               }}
               className={`tableItem ${hoveredTable === table.name ? 'tableItemHover' : ''} ${selectedTable === table.name ? 'tableItemSelected' : ''}`}
             >
@@ -68,6 +90,11 @@ const App = () => {
           className="addTableButton"
         >
           + New Table
+        </button>
+        <button
+          onClick={() => setShowQueryTable(true)}
+          className="toggleButton">
+            Query Table
         </button>
         <button
           onClick={() => setDarkMode(!darkMode)}
@@ -97,7 +124,18 @@ const App = () => {
             onSave={handleSaveUpdatedRow}
             onCancel={() => setShowUpdateTable(false)}
           />
-        ) : (
+        ) : showQueryTable ? (
+          <QueryTable
+          onCancel={() => setShowQueryTable(false)}
+          tables={tables.map(table => table.name)}
+          columns={tables.reduce((acc, table) => {
+            acc[table.name] = table.columns;
+            return acc;
+          }, {})}
+          onQuery={handleExecuteQuery}
+        />
+        ) :
+        (
           <TableView
             selectedTable={selectedTable}
             tableData={tableData}

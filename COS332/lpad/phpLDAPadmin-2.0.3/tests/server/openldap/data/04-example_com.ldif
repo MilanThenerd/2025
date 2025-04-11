@@ -1,0 +1,16 @@
+# LDIF Export for dc=example.com
+
+#version: 1
+
+# Entry 1: dc=example.com
+dn: dc=example.com
+dc: example.com
+objectclass: dNSDomain
+
+# Entry 2: cn=group,dc=example.com
+dn: cn=group,dc=example.com
+cn: group
+gidnumber: 100
+objectclass: posixGroup
+objectclass: top
+

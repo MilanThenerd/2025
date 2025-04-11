@@ -26,7 +26,6 @@
   min-height: 100vh;
 
   background: linear-gradient(45deg, var(--app-primary), var(--app-secondary));
-  border-radius: 16px;
 
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 
@@ -40,7 +39,7 @@
   margin: 10px 0;
 
   background: transparent;
-  border: 2px solid rgba(255,255,255,.1);
+  border: 2px solid rgba(255,255,255,.2);
   backdrop-filter: blur(30px);
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, .2);
@@ -126,7 +125,7 @@
   margin: 10px;
 
   background: transparent;
-  border: 2px solid rgba(255,255,255,.1);
+  border: 2px solid rgba(255,255,255,.2);
   backdrop-filter: blur(30px);
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, .2);
@@ -213,7 +212,7 @@
   margin-bottom: 10px;
   
   background: transparent;
-  border: 2px solid rgba(255,255,255,.1);
+  border: 2px solid rgba(255,255,255,.2);
   backdrop-filter: blur(30px);
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, .2);
@@ -226,7 +225,7 @@
 select.inputField {
   color: var(--text-primary);
   background-color: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   padding: 10px;
   appearance: none;
@@ -283,4 +282,106 @@ select.inputField {
   background-color: var(--button-primary);
   color: var(--button-text-primary);
   border: none;
+}
+
+.queryConditionsHorizontal {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 20px 0;
+  border: 2px solid rgba(255,255,255,.2);
+  border-radius: 8px;
+}
+
+.queryConditionHorizontal {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.queryActions {
+  display: flex;
+  gap: 5px;
+  margin-left: 5px;
+}
+
+.smallButton {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.removeButton {
+  background-color: var(--button-primary);
+  color: #c62828;
+}
+
+.addButton {
+  background-color: var(--button-primary);
+  color: #2e7d32;
+}
+
+.primaryButton {
+  background-color: var(--button-primary);
+  color: var(--button-text-primary);
+}
+
+/* Loading overlay */
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  color: white;
+}
+
+.loadingSpinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid white;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorBanner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff6b6b;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.closeError {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0;
 }

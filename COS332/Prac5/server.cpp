@@ -48,28 +48,24 @@ void search_friend(LDAP* ldap, const std::string& name) {
 void add_friend(LDAP* ldap, const std::string& name, const std::string& telephone) {
   std::string dn = "cn=" + name + ",ou=Friends,dc=example,dc=com";
   
-  LDAPMod* mods[5];  // 4 attributes + NULL terminator
+  LDAPMod* mods[5];
   LDAPMod mod_cn, mod_sn, mod_telephone, mod_objectclass;
 
-  // CN (Common Name)
   char* cn_val[] = { const_cast<char*>(name.c_str()), NULL };
   mod_cn.mod_op = LDAP_MOD_ADD;
   mod_cn.mod_type = const_cast<char*>("cn");
   mod_cn.mod_values = cn_val;
 
-  // SN (Surname) - using name as surname for simplicity
   char* sn_val[] = { const_cast<char*>(name.c_str()), NULL };
   mod_sn.mod_op = LDAP_MOD_ADD;
   mod_sn.mod_type = const_cast<char*>("sn");
   mod_sn.mod_values = sn_val;
 
-  // Telephone
   char* tel_val[] = { const_cast<char*>(telephone.c_str()), NULL };
   mod_telephone.mod_op = LDAP_MOD_ADD;
   mod_telephone.mod_type = const_cast<char*>("telephoneNumber");
   mod_telephone.mod_values = tel_val;
 
-  // ObjectClass
   char* oc_val[] = { const_cast<char*>("inetOrgPerson"), NULL };
   mod_objectclass.mod_op = LDAP_MOD_ADD;
   mod_objectclass.mod_type = const_cast<char*>("objectClass");
@@ -101,11 +97,11 @@ void prompt_and_add_friend(LDAP* ldap) {
 int main() {
     const char* ldap_uri = std::getenv("LDAP_URI");
     if (!ldap_uri) {
-        ldap_uri = "ldap://127.0.0.1";  // Default to service name in Docker
+        ldap_uri = "ldap://127.0.0.1";
     }
     const int ldap_version = LDAP_VERSION3;
     const char* bind_dn = "cn=admin,dc=example,dc=com";
-    const char* bind_pw = "3918";  // In real code, get this securely
+    const char* bind_pw = "3918";
 
     LDAP* ldap;
     int rc = ldap_initialize(&ldap, ldap_uri);
