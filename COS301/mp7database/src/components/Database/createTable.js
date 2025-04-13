@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../index.css';
+import '../../index.css';
 
 const DATA_TYPES = ['string', 'number', 'boolean', 'date'];
 

@@ -856,6 +856,12 @@ private:
   Polyhedrons *cowlOutlet_4;
   Polyhedrons *cowlOutlet_5;
 
+  Polyhedrons *cowlOutlet_6;
+  Polyhedrons *cowlOutlet_7;
+  Polyhedrons *cowlOutlet_8;
+  Polyhedrons *cowlOutlet_9;
+  Polyhedrons *cowlOutlet_10;
+
   Polyhedrons *radiatorBody;
   Polyhedrons *radiatorIntake;
 
@@ -1244,10 +1250,73 @@ private:
 
     glm::mat4 cowlOutlet_1Transform = transform;
     cowlOutlet_1Transform = Math::translate(cowlOutlet_1Transform, bodyOffset);
-    cowlOutlet_1Transform = Math::rotate(cowlOutlet_1Transform, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    cowlOutlet_1Transform = Math::rotate(cowlOutlet_1Transform, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    cowlOutlet_1Transform = Math::translate(cowlOutlet_1Transform, glm::vec3(2.0f, -0.5f, 1.0f));
+    cowlOutlet_1Transform = Math::rotate(cowlOutlet_1Transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_1Transform = Math::translate(cowlOutlet_1Transform, glm::vec3(0.0f, 1.25f, 5.0f));
+    cowlOutlet_1Transform = Math::rotate(cowlOutlet_1Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     cowlOutlet_1->setTransformation(cowlOutlet_1Transform);
+
+    glm::mat4 cowlOutlet_2Transform = transform;
+    cowlOutlet_2Transform = Math::translate(cowlOutlet_2Transform, bodyOffset);
+    cowlOutlet_2Transform = Math::rotate(cowlOutlet_2Transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_2Transform = Math::translate(cowlOutlet_2Transform, glm::vec3(0.0f, 1.25f, 4.7f));
+    cowlOutlet_2Transform = Math::rotate(cowlOutlet_2Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cowlOutlet_2->setTransformation(cowlOutlet_2Transform);
+
+    glm::mat4 cowlOutlet_3Transform = transform;
+    cowlOutlet_3Transform = Math::translate(cowlOutlet_3Transform, bodyOffset);
+    cowlOutlet_3Transform = Math::rotate(cowlOutlet_3Transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_3Transform = Math::translate(cowlOutlet_3Transform, glm::vec3(0.0f, 1.25f, 4.4f));
+    cowlOutlet_3Transform = Math::rotate(cowlOutlet_3Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cowlOutlet_3->setTransformation(cowlOutlet_3Transform);
+
+    glm::mat4 cowlOutlet_4Transform = transform;
+    cowlOutlet_4Transform = Math::translate(cowlOutlet_4Transform, bodyOffset);
+    cowlOutlet_4Transform = Math::rotate(cowlOutlet_4Transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_4Transform = Math::translate(cowlOutlet_4Transform, glm::vec3(0.0f, 1.25f, 4.1f));
+    cowlOutlet_4Transform = Math::rotate(cowlOutlet_4Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cowlOutlet_4->setTransformation(cowlOutlet_4Transform);
+
+    glm::mat4 cowlOutlet_5Transform = transform;
+    cowlOutlet_5Transform = Math::translate(cowlOutlet_5Transform, bodyOffset);
+    cowlOutlet_5Transform = Math::rotate(cowlOutlet_5Transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_5Transform = Math::translate(cowlOutlet_5Transform, glm::vec3(0.0f, 1.25f, 3.8f));
+    cowlOutlet_5Transform = Math::rotate(cowlOutlet_5Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cowlOutlet_5->setTransformation(cowlOutlet_5Transform);
+
+    glm::mat4 cowlOutlet_6Transform = transform;
+    cowlOutlet_6Transform = Math::translate(cowlOutlet_6Transform, bodyOffset);
+    cowlOutlet_6Transform = Math::rotate(cowlOutlet_6Transform, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_6Transform = Math::translate(cowlOutlet_6Transform, glm::vec3(0.0f, 1.25f, 5.0f));
+    cowlOutlet_6Transform = Math::rotate(cowlOutlet_6Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cowlOutlet_6->setTransformation(cowlOutlet_6Transform);
+
+    glm::mat4 cowlOutlet_7Transform = transform;
+    cowlOutlet_7Transform = Math::translate(cowlOutlet_7Transform, bodyOffset);
+    cowlOutlet_7Transform = Math::rotate(cowlOutlet_7Transform, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_7Transform = Math::translate(cowlOutlet_7Transform, glm::vec3(0.0f, 1.25f, 4.7f));
+    cowlOutlet_7Transform = Math::rotate(cowlOutlet_7Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cowlOutlet_7->setTransformation(cowlOutlet_7Transform);
+
+    glm::mat4 cowlOutlet_8Transform = transform;
+    cowlOutlet_8Transform = Math::translate(cowlOutlet_8Transform, bodyOffset);
+    cowlOutlet_8Transform = Math::rotate(cowlOutlet_8Transform, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_8Transform = Math::translate(cowlOutlet_8Transform, glm::vec3(0.0f, 1.25f, 4.4f));
+    cowlOutlet_8Transform = Math::rotate(cowlOutlet_8Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cowlOutlet_8->setTransformation(cowlOutlet_8Transform);
+    
+    glm::mat4 cowlOutlet_9Transform = transform;
+    cowlOutlet_9Transform = Math::translate(cowlOutlet_9Transform, bodyOffset);
+    cowlOutlet_9Transform = Math::rotate(cowlOutlet_9Transform, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_9Transform = Math::translate(cowlOutlet_9Transform, glm::vec3(0.0f, 1.25f, 4.1f));
+    cowlOutlet_9Transform = Math::rotate(cowlOutlet_9Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cowlOutlet_9->setTransformation(cowlOutlet_9Transform);
+
+    glm::mat4 cowlOutlet_10Transform = transform;
+    cowlOutlet_10Transform = Math::translate(cowlOutlet_10Transform, bodyOffset);
+    cowlOutlet_10Transform = Math::rotate(cowlOutlet_10Transform, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cowlOutlet_10Transform = Math::translate(cowlOutlet_10Transform, glm::vec3(0.0f, 1.25f, 3.8f));
+    cowlOutlet_10Transform = Math::rotate(cowlOutlet_10Transform, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    cowlOutlet_10->setTransformation(cowlOutlet_10Transform);
   }
 
 public:
@@ -1317,7 +1386,16 @@ public:
 
 
     cowlOutlet_1 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
+    cowlOutlet_2 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
+    cowlOutlet_3 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
+    cowlOutlet_4 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
+    cowlOutlet_5 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
 
+    cowlOutlet_6 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
+    cowlOutlet_7 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
+    cowlOutlet_8 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
+    cowlOutlet_9 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
+    cowlOutlet_10 = new Polyhedrons(createCylinder(0.1f , 1.0f), getColor(0.0f , 0.0f , 0.0f , 36*12) , 36*12);
 
     tailCone = new Polyhedrons(createCone(bodyWidth * 0.6, bodyLength * 0.1), bodyColor, 36 * 6);
     tailConeOffset = glm::vec3(0, 0, -bodyLength * 0.95);
@@ -1389,6 +1467,15 @@ public:
     propellor4->upload();
 
     cowlOutlet_1->upload();
+    cowlOutlet_2->upload();
+    cowlOutlet_3->upload();
+    cowlOutlet_4->upload();
+    cowlOutlet_5->upload();
+    cowlOutlet_6->upload();
+    cowlOutlet_7->upload();
+    cowlOutlet_8->upload();
+    cowlOutlet_9->upload();
+    cowlOutlet_10->upload();
 
     tailBody->upload();
 
@@ -1437,6 +1524,16 @@ public:
     noseBody_2->draw();
 
     cowlOutlet_1->draw();
+    cowlOutlet_2->draw();
+    cowlOutlet_3->draw();
+    cowlOutlet_4->draw();
+    cowlOutlet_5->draw();
+
+    cowlOutlet_6->draw();
+    cowlOutlet_7->draw();
+    cowlOutlet_8->draw();
+    cowlOutlet_9->draw();
+    cowlOutlet_10->draw();
 
     wingRight->draw();
     wingFlapRight->draw();

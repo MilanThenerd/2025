@@ -20,6 +20,8 @@
   --button-text-primary: #4a7856;
 }
 
+
+
 .appContainer {
   display: flex;
   height: 100%;
@@ -50,6 +52,31 @@
   color: var(--text-primary);
 }
 
+.user-info {
+  /* padding: 15px; */
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout-button {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+
+  background-color: var(--button-primary);
+  color: var(--button-text-primary);
+  
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logout-button:hover {
+  background: var(--button-secondary);
+  color: var(--text-primary);
+}
 
 .sidebarTitle {
   font-size: 24px;
@@ -114,6 +141,7 @@
 .addTableButton:hover,
 .toggleButton:hover {
   background-color: var(--button-secondary);
+  color: var(--text-primary);
 }
 
 .mainContent {
@@ -163,6 +191,7 @@
 
 .actionButton:hover {
   background-color: var(--button-secondary);
+  color: var(--text-primary);
 }
 
 .dataTable {
@@ -199,6 +228,7 @@
 .updateButton:hover,
 .deleteButton:hover {
   background-color: var(--button-secondary);
+  color: var(--text-primary);
 }
 
 .errorMessage {
@@ -276,6 +306,7 @@ select.inputField {
 .createButton:hover,
 .cancelButton:hover {
   background-color: var(--button-secondary);
+  color: var(--text-primary);
 }
 
 .fileInput::file-selector-button {

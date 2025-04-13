@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import '../index.css';
+import '../../index.css';
 
-const UpdateTable = ({ row, columns, onSave, onCancel, selectedTable }) => {
-  const [rowData, setRowData] = useState(row);
+const InsertTable = ({ onCancel, onInsert, columns, selectedTable }) => {
+  const [rowData, setRowData] = useState({});
   const [error, setError] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e, key, type) => {
     let value = e.target.value;
@@ -21,11 +21,14 @@ const UpdateTable = ({ row, columns, onSave, onCancel, selectedTable }) => {
       }
     } else if (type === 'boolean') {
       value = value.toLowerCase();
-      if (value !== 'true' && value !== 'false') {
-        setError(`Invalid boolean for column: ${key}. Use "true" or "false".`);
+      if (value === 'true') {
+        value = true;
+      } else if (value === 'false') {
+        value = false;
+      } else {
+        setError(`Invalid boolean value for column: ${key}`);
         return;
       }
-      value = value === 'true';
     } else if (type === 'date') {
       if (value === '') {
         setError(`Field cannot be empty for column: ${key}`);
@@ -43,50 +46,50 @@ const UpdateTable = ({ row, columns, onSave, onCancel, selectedTable }) => {
     setError('');
   };
 
-  const handleSave = async () => {
+  const handleSubmit = async () => {
     try {
-      setIsSaving(true);
-      
+      setIsSubmitting(true);
       for (const column of columns) {
         const value = rowData[column.name];
         if (value === undefined || value === '') {
           setError(`All fields are required.`);
-          setIsSaving(false);
+          setIsSubmitting(false);
           return;
         }
         if (column.type === 'number' && typeof value !== 'number') {
           setError(`Invalid data type for column "${column.name}". Expected a number.`);
-          setIsSaving(false);
+          setIsSubmitting(false);
           return;
         }
         if (column.type === 'boolean' && typeof value !== 'boolean') {
           setError(`Invalid data type for column "${column.name}". Expected a boolean.`);
-          setIsSaving(false);
+          setIsSubmitting(false);
           return;
         }
         if (column.type === 'date' && isNaN(Date.parse(value))) {
           setError(`Invalid data type for column "${column.name}". Expected a valid date.`);
-          setIsSaving(false);
+          setIsSubmitting(false);
           return;
         }
         if (column.type === 'string' && typeof value !== 'string') {
           setError(`Invalid data type for column "${column.name}". Expected a string.`);
-          setIsSaving(false);
+          setIsSubmitting(false);
           return;
         }
       }
 
-      await onSave(rowData);
+      await onInsert(rowData);
+      onCancel();
     } catch (err) {
-      setError(err.message || 'Failed to update data');
+      setError(err.message || 'Failed to insert data');
     } finally {
-      setIsSaving(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="tableContainer">
-      <h2 className="tableTitle">Update Data in {selectedTable}</h2>
+      <h2 className="tableTitle">Insert Data into {selectedTable}</h2>
       {error && <div className="errorMessage">{error}</div>}
       <div className="inputGroup">
         {columns.map((column) => (
@@ -98,14 +101,14 @@ const UpdateTable = ({ row, columns, onSave, onCancel, selectedTable }) => {
                 value={rowData[column.name] || ''}
                 onChange={(e) => handleInputChange(e, column.name, column.type)}
                 className="inputField"
-                disabled={isSaving}
+                disabled={isSubmitting}
               />
             ) : column.type === 'boolean' ? (
               <select
                 value={rowData[column.name] ?? ''}
                 onChange={(e) => handleInputChange(e, column.name, column.type)}
                 className="inputField"
-                disabled={isSaving}
+                disabled={isSubmitting}
               >
                 <option value="">Select a value</option>
                 <option value="true">True</option>
@@ -118,7 +121,7 @@ const UpdateTable = ({ row, columns, onSave, onCancel, selectedTable }) => {
                 value={rowData[column.name] || ''}
                 onChange={(e) => handleInputChange(e, column.name, column.type)}
                 className="inputField"
-                disabled={isSaving}
+                disabled={isSubmitting}
               />
             )}
           </div>
@@ -126,16 +129,16 @@ const UpdateTable = ({ row, columns, onSave, onCancel, selectedTable }) => {
       </div>
       <div className="buttonGroup">
         <button 
-          onClick={handleSave} 
+          onClick={handleSubmit} 
           className="actionButton"
-          disabled={isSaving}
+          disabled={isSubmitting}
         >
-          {isSaving ? 'Saving...' : 'Save'}
+          {isSubmitting ? 'Inserting...' : 'Insert'}
         </button>
         <button 
           onClick={onCancel} 
           className="actionButton"
-          disabled={isSaving}
+          disabled={isSubmitting}
         >
           Cancel
         </button>
@@ -144,4 +147,4 @@ const UpdateTable = ({ row, columns, onSave, onCancel, selectedTable }) => {
   );
 };
 
-export default UpdateTable;
+export default InsertTable;

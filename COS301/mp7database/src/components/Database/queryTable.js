@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../index.css';
+import '../../index.css';
 
 const QueryTable = ({ onCancel, tables, columns, onQuery }) => {
   const [queries, setQueries] = useState([
@@ -254,18 +254,17 @@ const QueryTable = ({ onCancel, tables, columns, onQuery }) => {
         </button>
       </div>
 
-      <div className="resultsContainer">
-        <h3>Query Results ({results.length} records)</h3>
+      <div className="tableContainer">
+        <h2 className="tableTitle">Query Results ({results.length} records)</h2>
         
         {isLoading ? (
           <div className="loadingIndicator">Loading results...</div>
         ) : results.length > 0 ? (
-          <div className="resultsTableWrapper">
-            <table className="resultsTable">
+            <table className="dataTable">
               <thead>
                 <tr>
                   {resultColumns.map(col => (
-                    <th key={col}>{col}</th>
+                    <th key={col} className="tableHeader">{col}</th>
                   ))}
                 </tr>
               </thead>
@@ -273,7 +272,7 @@ const QueryTable = ({ onCancel, tables, columns, onQuery }) => {
                 {results.map((row, rowIndex) => (
                   <tr key={rowIndex}>
                     {resultColumns.map(col => (
-                      <td key={`${rowIndex}-${col}`}>
+                      <td key={`${rowIndex}-${col}`} className="tableCell">
                         {typeof row[col] === 'object' 
                           ? JSON.stringify(row[col]) 
                           : String(row[col] ?? 'NULL')}
@@ -283,7 +282,6 @@ const QueryTable = ({ onCancel, tables, columns, onQuery }) => {
                 ))}
               </tbody>
             </table>
-          </div>
         ) : (
           <div className="noResults">No results to display</div>
         )}

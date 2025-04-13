@@ -14,12 +14,12 @@ class APIWrapper {
   //  *
   //  * @throws {Error} If the request fails or the response is not OK.
   //  */
-  async request(endpoint, method = "GET", body = null) { // required parameter, all fields are optional except endpoint. THe default values for method is "GET" and the default value for body is NULL
+  async request(endpoint, method = 'GET', body = null) { // required parameter, all fields are optional except endpoint. THe default values for method is "GET" and the default value for body is NULL
       //configure the settigns for the fetch api call. It defines how the HTTP request should be made including method (GET POST) and headers if nececary
       const options = {
           method, // HTTP method (GET, POST, etc.)
           headers: {
-              "Content-Type": "application/json" // this can stay
+              'Content-Type': 'application/json' // this can stay
           }
       };
 
@@ -38,7 +38,7 @@ class APIWrapper {
           return await response.json(); // Convert response to JSON
 
       } catch (error) {
-          console.error("Request failed:", error);
+          console.error('Request failed:', error);
           return null;
       }
   }
@@ -70,7 +70,7 @@ class APIWrapper {
    */
   async getUser(userID) {
       if(!userID){
-          throw new Error("User ID is required")
+          throw new Error('User ID is required')
       }
       return this.request(`/users/${userID}`);
   }
@@ -83,7 +83,7 @@ class APIWrapper {
    * @returns {Promise<object[]>} - A list of users.
    */
   async getUsers() {
-      return this.request("/users");
+      return this.request('/users');
   }
   // Create a new user 
   // registerUser: /register (POST) ->
@@ -96,10 +96,10 @@ class APIWrapper {
    * @throws {Error} If userData is not an object.
    */
   async registerUser(userData) {
-      if(!userData || typeof userData !== "object"){
-          throw new Error("Valid user data is required");
+      if(!userData || typeof userData !== 'object'){
+          throw new Error('Valid user data is required');
       }
-      return this.request("/register", "POST", userData);
+      return this.request('/register', 'POST', userData);
   }
 
   //Login
@@ -112,10 +112,10 @@ class APIWrapper {
    * @throws {Error} If userData is not an object.
    */
   async loginUser(userData) {
-      if(!userData || typeof userData !== "object"){
-          throw new Error("Valid login data is required");
+      if(!userData || typeof userData !== 'object'){
+          throw new Error('Valid login data is required');
       }
-      return this.request("/login", "POST", userData);
+      return this.request('/login', 'POST', userData);
   }
 
   // Update a user
@@ -131,12 +131,12 @@ class APIWrapper {
    */
   async updateUser(userID, updatedData) {
       if(!userID) {
-          throw new Error("User ID is required");
+          throw new Error('User ID is required');
       }
-      if(!updatedData || typeof updatedData !== "object"){
-          throw new Error("Updated user data is required")
+      if(!updatedData || typeof updatedData !== 'object'){
+          throw new Error('Updated user data is required')
       }
-      return this.request(`/users/${userID}`, "PUT", updatedData);
+      return this.request(`/users/${userID}`, 'PUT', updatedData);
   }
 
 
@@ -152,9 +152,9 @@ class APIWrapper {
    */
   async deleteUser(userID) {
       if(!userID){
-          throw new Error("User ID is required");
+          throw new Error('User ID is required');
       }
-      return this.request(`/users/${userID}`, "DELETE");
+      return this.request(`/users/${userID}`, 'DELETE');
   }
 
   //honestly no clue what this read was for so I got rid of it
@@ -171,9 +171,9 @@ class APIWrapper {
 
       if (!databaseID)
       {
-         throw new Error("Database id is required");
+         throw new Error('Database id is required');
       }
-      return this.request("/database/info");
+      return this.request('/database/info');
       // returns ex
       //{
       //  "name": "MyNoSQLDB",
@@ -186,13 +186,13 @@ class APIWrapper {
 //queryDocuments: /databases/:databaseID/collections/:collection/documents/query (POST) -> .emit("addCommand", "create", data)
   async queryDocuments(databaseID, collectionName,query) 
   {
-      // return this.request(`/collections/${collection}/documents/query`, "POST", filter);
+      return this.request(`/collections/${collection}/documents/query`, 'POST', filter);
   }
 
 //listRecords: /databases/:databaseID/collections/:collection/indexes            (GET)  -> .emit("addCommand", "list", data)
   async listRecords(databaseID,collectionName) 
   {
-      // return this.request(`/collections/${collection}/indexes`);
+      return this.request(`/collections/${collection}/indexes`);
   }
       
 
@@ -210,7 +210,7 @@ class APIWrapper {
   {
          if (!databaseID)
           {
-             throw new Error("Database id is required");
+             throw new Error('Database id is required');
          }
          // Construct the nested data structure that the daemon expects
          const data = {
@@ -218,7 +218,7 @@ class APIWrapper {
          };
  
          // Send the request to API create a collection
-         return this.request(`/databases`, "POST", data);
+         return this.request(`/databases`, 'POST', data);
   }
 
 // deleteDatabase:	/databases/:databaseID   (DELETE) -> .emit("addCommand", "delete", data)
@@ -233,10 +233,10 @@ class APIWrapper {
   {
       if (!databaseID) 
       {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
 
-      return this.request(`/databases/${databaseID}`, "DELETE"); 
+      return this.request(`/databases/${databaseID}`, 'DELETE'); 
   }
 
 // getDatabase:	/databases/:databaseID   (GET)    -> .emit("addCommand", "read", data)
@@ -251,7 +251,7 @@ class APIWrapper {
   {
       if (!databaseID) 
       {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
 
       // Construct the nested data structure that the daemon expects.
@@ -259,7 +259,7 @@ class APIWrapper {
       {
           databaseID: {} 
       };
-      return this.request(`/databases/${databaseID}`, "GET", data); 
+      return this.request(`/databases/${databaseID}`, 'GET', data); 
   }
 
   // getAllDatabase: /databases               (GET)    -> .emit("addCommand", "read", data)   
@@ -270,7 +270,7 @@ class APIWrapper {
    */
   async getAllDatabase()
   {
-      return this.request(`/databases`, "GET"); 
+      return this.request(`/databases`, 'GET'); 
   }
 
 //updateDatabase: /databases/:databaseID   (PUT)    -> .emit("addCommand", "update", data)
@@ -285,14 +285,14 @@ class APIWrapper {
   {
       if (!databaseID) 
       {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
       if (!updatedData) 
       {
-          throw new Error("updated database data is required");
+          throw new Error('updated database data is required');
       }
 
-      return this.request(`/databases/${databaseID}`, "PUT", updatedData); 
+      return this.request(`/databases/${databaseID}`, 'PUT', updatedData); 
   }
 
 //collection operations
@@ -308,12 +308,12 @@ class APIWrapper {
   {
       if (!databaseID) 
           {
-          throw new Error("Database name is required");
+          throw new Error('Database name is required');
       }
 
       if (!collectionName) 
           {
-          throw new Error("Collection name is required");
+          throw new Error('Collection name is required');
       }
 
       // Construct the nested data structure that the daemon expects
@@ -324,7 +324,7 @@ class APIWrapper {
       };
 
       // Send the request to API create a collection
-      return this.request(`/databases/${databaseID}/collections`, "POST", data);
+      return this.request(`/databases/${databaseID}/collections`, 'POST', data);
   }
 // dropCollection: /databases/:databaseID/collections/:name (DELETE) -> .emit("addCommand", "delete", data)
   /**
@@ -338,16 +338,16 @@ class APIWrapper {
   {
       if (!databaseID) 
       {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
 
       if (!collectionName) 
       {
-          throw new Error("Collection name is required");
+          throw new Error('Collection name is required');
       }
 
       // Send the request to API create a collection
-      return this.request(`/databases/${databaseID}/collections/${collectionName}`, "DELETE");
+      return this.request(`/databases/${databaseID}/collections/${collectionName}`, 'DELETE');
   }
 // getCollection:  /databases/:databaseID/collections/:name (GET)    -> .emit("addCommand", "read", data)
   /**
@@ -361,16 +361,16 @@ class APIWrapper {
   {
       if (!databaseID) 
       {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
 
       if (!collectionName) 
       {
-          throw new Error("Collection name is required");
+          throw new Error('Collection name is required');
       }
 
       // Send the request to API create a collection
-      return this.request(`/databases/${databaseID}/collections/${collectionName}`, "GET");
+      return this.request(`/databases/${databaseID}/collections/${collectionName}`, 'GET');
   }
 // getAllCollections: /databases/:databaseID/collections    (GET)    -> .emit("addCommand", "read", data)
   /**
@@ -383,11 +383,11 @@ class APIWrapper {
   {
       if (!databaseID) 
       {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
 
       // Send the request to API create a collection
-      return this.request(`/databases/${databaseID}/collections/`, "GET");
+      return this.request(`/databases/${databaseID}/collections/`, 'GET');
   }
 // UpdateCollection: /databases/:databaseID		 (PUT)    -> .emit("addCommand", "update",data)
   /**
@@ -400,14 +400,14 @@ class APIWrapper {
      {
          if (!databaseID) 
          {
-             throw new Error("Database id is required");
+             throw new Error('Database id is required');
          }
          if(!updatedCollection)
          {
-              throw new Error("Updated collection data is required")
+              throw new Error('Updated collection data is required')
          }
          // Send the request to API create a collection
-         return this.request(`/databases/${databaseID}/collections/`, "PUT",updatedCollection);
+         return this.request(`/databases/${databaseID}/collections/`, 'PUT',updatedCollection);
      }
 //document operations
 //createDocument: /databases/:databaseID/collections/:collection/documents     (POST)    -> .emit("addCommand", "create", data)
@@ -423,17 +423,17 @@ class APIWrapper {
   {
       if (!databaseID) 
           {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
 
       if (!collectionName) 
           {
-          throw new Error("Collection name is required");
+          throw new Error('Collection name is required');
       }
 
       if(!documentName)
       {
-          throw new Error("Document name is required");
+          throw new Error('Document name is required');
       }
 
       // Construct the nested data structure that the daemon expects
@@ -447,7 +447,7 @@ class APIWrapper {
       };
 
       // Send the request to API create a collection
-      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents`, "POST", data);
+      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents`, 'POST', data);
   }
 
 //deleteDocument: /databases/:databaseID/collections/:collection/documents/:id (DELETE)  -> .emit("addCommand", "delete", data)
@@ -463,21 +463,21 @@ class APIWrapper {
   {
       if (!databaseID) 
           {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
 
       if (!collectionName) 
           {
-          throw new Error("Collection name is required");
+          throw new Error('Collection name is required');
       }
 
       if(!documentName)
       {
-          throw new Error("Document name is required");
+          throw new Error('Document name is required');
       }
 
       // Send the request to API create a collection
-      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents/${documentName}`, "DELETE");
+      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents/${documentName}`, 'DELETE');
   }
 //getDocument:    /databases/:databaseID/collections/:collection/documents/:id (GET)     -> .emit("addCommand", "read", data)
   /**
@@ -492,21 +492,21 @@ class APIWrapper {
   {
       if (!databaseID) 
           {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
 
       if (!collectionName) 
           {
-          throw new Error("Collection name is required");
+          throw new Error('Collection name is required');
       }
 
       if(!documentName)
       {
-          throw new Error("Document name is required");
+          throw new Error('Document name is required');
       }
 
       // Send the request to API create a collection
-      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents/${documentName}`, "GET");
+      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents/${documentName}`, 'GET');
   }
 //getAllDocuments:/databases/:databaseID/collections/:collection/documents     (GET)     -> .emit("addCommand", "read", data)
   /**
@@ -520,15 +520,15 @@ class APIWrapper {
   {
       if (!databaseID) 
           {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
       if (!collectionName) 
           {
-          throw new Error("Collection name is required");
+          throw new Error('Collection name is required');
       }
 
       // Send the request to API create a collection
-      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents`, "GET");
+      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents`, 'GET');
   }
 //updateDocument: /databases/:databaseID/collections/:collection/documents/:id (PUT)     -> .emit("addCommand", "update", data)
   /**
@@ -544,25 +544,25 @@ class APIWrapper {
   {
       if (!databaseID) 
           {
-          throw new Error("Database id is required");
+          throw new Error('Database id is required');
       }
 
       if (!collectionName) 
           {
-          throw new Error("Collection name is required");
+          throw new Error('Collection name is required');
       }
 
       if(!documentName)
       {
-          throw new Error("Document name is required");
+          throw new Error('Document name is required');
       }
 
       if(!updatedDocument)
       {
-          throw new Error("Updated data is required");
+          throw new Error('Updated data is required');
       }
       // Send the request to API create a collection
-      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents/${documentName}`, "PUT",updatedDocument);
+      return this.request(`/databases/${databaseID}/collections/${collectionName}/documents/${documentName}`, 'PUT',updatedDocument);
   }
   
       
