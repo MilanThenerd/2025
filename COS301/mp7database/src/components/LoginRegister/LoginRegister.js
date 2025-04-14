@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./LoginRegister.css";
 
-const LoginRegister = ({ onLogin, onRegister }) => {
+const LoginRegister = ({ onLogin, onRegister , rememberMe , setRememberMe}) => {
     const [isRegistering, setIsRegistering] = useState(false);
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -59,7 +59,7 @@ const LoginRegister = ({ onLogin, onRegister }) => {
 
                     <div className="remember-forgot">
                         <label>
-                            <input type="checkbox" /> Remember me
+                            <input type="checkbox" onChange={(e) => setRememberMe(e.target.checked)}/> Remember me
                         </label>
                         <a href="#">Forgot password?</a>
                     </div>
@@ -120,7 +120,7 @@ const LoginRegister = ({ onLogin, onRegister }) => {
 
                     <div className="remember-forgot">
                         <label>
-                            <input type="checkbox" required /> I agree to the terms and conditions
+                            <input type="checkbox" onClick={() => setRememberMe(!rememberMe)}/> I agree to the terms and conditions
                         </label>
                     </div>
 

@@ -16,6 +16,8 @@ class APIWrapper {
   //  */
   async request(endpoint, method = 'GET', body = null) { // required parameter, all fields are optional except endpoint. THe default values for method is "GET" and the default value for body is NULL
       //configure the settigns for the fetch api call. It defines how the HTTP request should be made including method (GET POST) and headers if nececary
+      console.log(endpoint);
+      
       const options = {
           method, // HTTP method (GET, POST, etc.)
           headers: {

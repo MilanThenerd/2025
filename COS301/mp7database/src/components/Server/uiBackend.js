@@ -44,7 +44,10 @@ const mockApi = {
   updateRow: async (tableName, rowId, updatedData) => ({ ...updatedData, id: rowId }),
   deleteRow: async (tableName, rowId) => true,
   deleteTable: async (tableName) => true,
-  executeQuery: async (query) => [{ id: 1, name: 'Sample Result', value: 'Test' }],
+  executeQuery: async (query) => [
+    { id: 1, name: 'John', surname: 'Doe' }, 
+    {id: 2 , name:'Leroy' , surname:'Jenkins'}
+  ],
   login: async (username, password) => ({ success: true, token: 'mock-token' }),
   register: async (username, email, password) => ({ success: true }),
   verifyToken: async (token) => ({ valid: true })
@@ -66,6 +69,7 @@ const useTableManagement = () => {
   const [hoveredTable, setHoveredTable] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [username, setUsername] = useState('');
+  const [rememberMe , setRememberMe] = useState(false);
 
   const callApiWithFallback = async (apiCall, mockCall, errorMessage) => {
     try {
@@ -153,6 +157,7 @@ const useTableManagement = () => {
           if (valid) {
             setIsLoggedIn(true);
             setAuthToken(token);
+            setRememberMe(true);
           }
         } catch (err) {
           localStorage.removeItem('authToken');
@@ -169,7 +174,7 @@ const useTableManagement = () => {
     setLoading(true);
     try {
       const response = await callApiWithFallback(
-        () => api.loginUser({ username, password }),
+        () => api.loginUser(username + password),
         () => mockApi.login(username, password),
         "Login failed"
       );
@@ -178,7 +183,10 @@ const useTableManagement = () => {
         setIsLoggedIn(true);
         setAuthToken(response.token);
         setUsername(username);
-        localStorage.setItem('authToken', response.token);
+        if(rememberMe)
+        {
+          localStorage.setItem('authToken', response.token);
+        }
       } else {
         throw new Error('Invalid login response');
       }
@@ -217,6 +225,7 @@ const useTableManagement = () => {
     setTables([]);
     setTableData([]);
     setSelectedTable('');
+    setRememberMe(false);
   };
 
   const handleCreateTable = async (tableName, columns) => {
@@ -413,6 +422,8 @@ const useTableManagement = () => {
     setSelectedTable,
     setError,
     setIsLoggedIn,
+    setRememberMe,
+    rememberMe,
 
     handleLogin,
     handleRegister,

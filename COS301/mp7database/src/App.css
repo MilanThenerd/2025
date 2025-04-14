@@ -20,13 +20,11 @@
   --button-text-primary: #4a7856;
 }
 
-
-
 .appContainer {
   display: flex;
   height: 100%;
   min-height: 100vh;
-
+  overflow: hidden;
   background: linear-gradient(45deg, var(--app-primary), var(--app-secondary));
 
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
@@ -53,7 +51,6 @@
 }
 
 .user-info {
-  /* padding: 15px; */
   margin-bottom: 15px;
   display: flex;
   justify-content: space-between;
@@ -350,11 +347,13 @@ select.inputField {
 .removeButton {
   background-color: var(--button-primary);
   color: #c62828;
+  margin-bottom: 15px;
 }
 
 .addButton {
   background-color: var(--button-primary);
   color: #2e7d32;
+  margin-bottom: 15px;
 }
 
 .primaryButton {
@@ -362,7 +361,6 @@ select.inputField {
   color: var(--button-text-primary);
 }
 
-/* Loading overlay */
 .loadingOverlay {
   position: fixed;
   top: 0;
@@ -415,4 +413,71 @@ select.inputField {
   cursor: pointer;
   font-size: 1.2rem;
   padding: 0;
+}
+
+.joinButton {
+  padding: 10px;
+  max-width: 20%;
+  border-radius: 5px;
+}
+
+.joinEquals {
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.columnSelectionSection {
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.columnsGridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.tableColumnGroup {
+  padding: 15px;
+  border: 2px solid rgba(255,255,255,.2);
+  border-radius: 10px;
+}
+
+.tableGroupTitle {
+  margin: 0 0 10px 0;
+  padding-bottom: 5px;
+  font-size: 16px;
+}
+
+.columnsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.columnCheckbox {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
+
+.columnCheckbox input {
+  margin-right: 8px;
+  color: var(--button-primary);
+}
+
+.columnCheckbox label {
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.noColumnsMessage {
+  color: var(--text-primary);
+  font-style: italic;
+  padding: 10px;
 }

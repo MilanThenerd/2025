@@ -1,6 +1,6 @@
 import React from 'react';
 import LoginRegister from './components/LoginRegister/LoginRegister';
-import useTableManagement from './components/Server/client';
+import useTableManagement from './components/Server/uiBackend';
 import CreateTable from './components/Database/createTable';
 import InsertTable from './components/Database/insertTable';
 import UpdateTable from './components/Database/updateTable';
@@ -43,6 +43,8 @@ const App = () => {
     setShowUpdateTable,
     setSelectedTable,
     setError,
+    setRememberMe,
+    rememberMe,
     handleLogout,
     username,
   } = useTableManagement();
@@ -50,8 +52,11 @@ const App = () => {
   return (
     !isLoggedIn ? (
       <LoginRegister 
-      onLogin={handleLogin} 
-      onRegister={handleRegister} />
+        onLogin={handleLogin} 
+        onRegister={handleRegister} 
+        rememberMe={rememberMe}
+        setRememberMe={setRememberMe}
+      />
     ) : (
       <div className={`appContainer ${darkMode ? 'darkMode' : ''}`}>
         
