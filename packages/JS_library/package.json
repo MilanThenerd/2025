@@ -1,0 +1,14 @@
+{
+    "name": "@mp7/js_library",
+    "version": "1.0.0",
+    "private": true,
+    "description": "API Wrapper with tests",
+    "main": "apiLibrary.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "devDependencies": {
+        "jest-environment-node": "^29.7.0",
+        "supertest": "^7.0.0"
+    }
+}
