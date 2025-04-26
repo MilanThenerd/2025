@@ -1,0 +1,242 @@
+/* Wrapper for two-column layout */
+.homePageWrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Left Section */
+.homePageContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f4f9;
+  text-align: center;
+  padding: 20px;
+}
+
+.homePageContainer h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.homePageContainer p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.homePageActions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.navigateButton,
+.logoutButton {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.navigateButton {
+  background-color: #6b21a8;
+  color: white;
+}
+
+.navigateButton:hover {
+  background-color: #9333ea;
+}
+
+.logoutButton {
+  background-color: #dc3545;
+  color: white;
+}
+
+.logoutButton:hover {
+  background-color: #b02a37;
+}
+
+.databasesSection {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+.databasesSection h2 {
+  font-size: 1.5rem;
+  color: #6b21a8;
+  margin-bottom: 1rem;
+}
+
+/* Right Section (Purple) */
+.databasesMirrorSection {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6b21a8, #9333ea); /* Purple gradient */
+  padding: 20px;
+}
+
+.databasesMirrorSection h2 {
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.databasesMirrorSection p {
+  font-size: 1.2rem;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+/* Shared list styles */
+.databaseList {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  max-width: 500px;
+}
+
+.databaseRow {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between li and button */
+    margin-bottom: 10px; /* Match databaseItem's margin */
+    width: 100%;
+    max-width: 500px; /* Match databaseList max-width */
+  }
+
+.databaseItem {
+  /* background-color: #f9f0ff;
+  border: 1px solid #6b21a8;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  color: #333;
+  cursor: pointer; */
+
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 1.1rem;
+  color: white;
+  cursor: pointer;
+  flex: 1; /* Take remaining space */
+}
+
+.databaseItem:hover {
+  background-color: #e9d8fd;
+}
+
+/* Adjust databaseItem in the purple section */
+.databasesMirrorSection .databaseItem {
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+  border: 1px solid white;
+  color: white;
+}
+
+.databasesMirrorSection .databaseItem:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark mode styles for left section */
+.appContainer.darkMode .homePageContainer {
+  background-color: #1a1a1a;
+}
+
+.appContainer.darkMode .homePageContainer h1 {
+  color: #e0e0e0;
+}
+
+.appContainer.darkMode .homePageContainer p {
+  color: #b0b0b0;
+}
+
+.appContainer.darkMode .databasesSection h2 {
+  color: #a78bfa;
+}
+
+.appContainer.darkMode .databaseItem {
+  background-color: #2d1b4e;
+  border-color: #a78bfa;
+  color: #e0e0e0;
+}
+
+.appContainer.darkMode .databaseItem:hover {
+  background-color: #4c1d95;
+}
+
+.appContainer.darkMode .databaseRow .databaseItem {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #a78bfa;
+    color: #e0e0e0;
+  }
+
+/* Dark mode for right section */
+.appContainer.darkMode .databasesMirrorSection {
+  background: linear-gradient(135deg, #4b1a7c, #7c3aed); 
+}
+
+.appContainer.darkMode .databaseRow .databaseItem:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+.appContainer.darkMode .databasesMirrorSection h2 {
+  color: #e0e0e0;
+}
+
+.appContainer.darkMode .databasesMirrorSection p {
+  color: #b0b0b0;
+}
+
+.appContainer.darkMode .databasesMirrorSection .databaseItem {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #a78bfa;
+  color: #e0e0e0;
+}
+
+.appContainer.darkMode .databasesMirrorSection .databaseItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.appContainer.darkMode .deleteButton {
+    color: #ff6b6b; /* Lighter red for dark mode */
+  }
+  
+  .appContainer.darkMode .deleteButton:hover {
+    color: #ff8787;
+  }
+
+.deleteButton {
+    background: none;
+    border: none;
+    color: #ff4d4f; /* Red for delete */
+    font-size: 25px;
+    cursor: pointer;
+    padding: 8px 15px;
+    line-height: 1;
+    
+  }
+  
+  .deleteButton:hover {
+    color: #d9363e; /* Darker red on hover */
+    font-weight: bold;
+  }
+  
+  .deleteButton:focus {
+    outline: 2px solid #007bff; /* Focus outline for accessibility */
+    outline-offset: 2px;
+  }
+

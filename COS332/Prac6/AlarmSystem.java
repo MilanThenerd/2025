@@ -1,21 +1,22 @@
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.time.*;
+import java.util.*;
 
 public class AlarmSystem {
     private static final String SMTP_SERVER = "localhost"; // Change to your SMTP server
     private static final int SMTP_PORT = 25;
-    private static final String FROM_EMAIL = "alarm@yourhouse.com";
-    private static final String TO_EMAIL = "you@yourhouse.com";
-    private static final String SUBJECT = "Home Alarm Notification";
+    private static final String FROM_EMAIL = "test@test";
+    private static final String TO_EMAIL = "test@test";
+    
     
     public static void main(String[] args) {
-        System.out.println("Home Alarm System - Email Notification Simulator");
-        System.out.println("Press 1 for Front Door, 2 for Back Door, 3 for Motion Detector, q to quit");
+        System.out.println("Home Alarm System - SMTP Notification");
+        System.out.println("Commands: 1=Front Door, 2=Back Door, 3=Motion, q=Quit");
         
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
+                System.out.print("> ");
                 String input = scanner.nextLine().toLowerCase();
                 
                 if (input.equals("q")) {
@@ -23,73 +24,89 @@ public class AlarmSystem {
                     break;
                 }
                 
-                String message = "";
+                String alertType;
                 switch (input) {
                     case "1":
-                        message = "ALERT: Front Door opened at " + LocalDateTime.now();
+                        alertType = "Front Door opened";
                         break;
                     case "2":
-                        message = "ALERT: Back Door opened at " + LocalDateTime.now();
+                        alertType = "Back Door opened";
                         break;
                     case "3":
-                        message = "ALERT: Motion detected at " + LocalDateTime.now();
+                        alertType = "Motion detected";
                         break;
                     default:
-                        System.out.println("Invalid input. Use 1, 2, 3 or q to quit.");
+                        System.out.println("Invalid input. Try 1, 2, 3 or q");
                         continue;
                 }
                 
-                System.out.println("Sending alert: " + message);
-                sendEmail(message);
+                String timestamp = LocalDateTime.now().toString();
+                String message = createEmailMessage(alertType, timestamp);
+                System.out.println("Sending alert: " + alertType + " at " + timestamp);
+                
+                if (sendRawEmail(message)) {
+                    System.out.println("Alert sent successfully!");
+                } else {
+                    System.out.println("Failed to send alert");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    private static void sendEmail(String body) {
+    private static String createEmailMessage(String alertType, String timestamp) {
+        // RFC 822 style email message
+        return "From: " + FROM_EMAIL + "\r\n" +
+               "To: " + TO_EMAIL + "\r\n" +
+               "Date: " + new Date() + "\r\n" +
+               "Subject: ALARM: " + alertType + "\r\n" +
+               "\r\n" + // Empty line separates headers from body
+               "ALERT: " + alertType + "\r\n" +
+               "Timestamp: " + timestamp + "\r\n" +
+               "\r\n" +
+               "This is an automated alert from your home alarm system.\r\n" +
+               "Please investigate immediately if unexpected.\r\n";
+    }
+    
+    private static boolean sendRawEmail(String message) {
         try (Socket socket = new Socket(SMTP_SERVER, SMTP_PORT);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
             
-            // Read server welcome message
-            System.out.println("Server: " + in.readLine());
+            // Read server greeting
+            String response = in.readLine();
+            System.out.println("S: " + response);
+            if (!response.startsWith("220")) return false;
             
-            // Send SMTP commands
-            sendCommand(out, in, "HELO " + InetAddress.getLocalHost().getHostName());
-            sendCommand(out, in, "MAIL FROM:<" + FROM_EMAIL + ">");
-            sendCommand(out, in, "RCPT TO:<" + TO_EMAIL + ">");
-            sendCommand(out, in, "DATA");
+            // SMTP conversation
+            if (!sendCommand(out, in, "HELO " + InetAddress.getLocalHost().getHostName())) return false;
+            if (!sendCommand(out, in, "MAIL FROM:<" + FROM_EMAIL + ">")) return false;
+            if (!sendCommand(out, in, "RCPT TO:<" + TO_EMAIL + ">")) return false;
+            if (!sendCommand(out, in, "DATA")) return false;
             
-            // Send email headers and body
-            out.println("From: " + FROM_EMAIL);
-            out.println("To: " + TO_EMAIL);
-            out.println("Subject: " + SUBJECT);
-            out.println("Date: " + new Date());
-            out.println(); // Empty line separates headers from body
-            out.println(body);
+            // Send message
+            out.print(message);
+            if (!sendCommand(out, in, ".")) return false;
             
-            // End of message
-            sendCommand(out, in, ".");
-            sendCommand(out, in, "QUIT");
-            
-            System.out.println("Email sent successfully!");
+            // End session
+            return sendCommand(out, in, "QUIT");
             
         } catch (Exception e) {
-            System.err.println("Failed to send email: " + e.getMessage());
+            System.err.println("SMTP error: " + e.getMessage());
+            return false;
         }
     }
     
-    private static void sendCommand(PrintWriter out, BufferedReader in, String command) throws IOException {
-        System.out.println("Client: " + command);
+    private static boolean sendCommand(PrintWriter out, BufferedReader in, String command) throws IOException {
+        System.out.println("C: " + command);
         out.println(command);
+        
         String response = in.readLine();
-        System.out.println("Server: " + response);
+        System.out.println("S: " + response);
         
         // Check if response code indicates success (2xx or 3xx)
-        if (response == null || response.length() < 3 || 
-            (response.charAt(0) != '2' && response.charAt(0) != '3')) {
-            throw new IOException("SMTP command failed: " + response);
-        }
+        return response != null && response.length() >= 3 && 
+               (response.charAt(0) == '2' || response.charAt(0) == '3');
     }
 }

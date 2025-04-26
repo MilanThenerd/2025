@@ -1,0 +1,915 @@
+#!/usr/bin/env node
+/*TODO: 
+  - Try show only 1 menu when disconnect occurs
+  - Integrate other list based commands
+  - Integrate the rest
+  - ID instead of key,value for find record
+  - Seperate testing int seperate file
+  - Passing int, floats and not just string values
+  - Ensure testing uses daemon
+*/
+import { io } from 'socket.io-client';
+import readline from 'readline';
+import boxen from 'boxen';
+import chalk from 'chalk';
+import Table from 'cli-table3';
+import { stdin as input, stdout as output } from 'process';
+import { runTests } from './cli_tests.js';
+import fs from 'fs';
+import path from 'path';
+
+// Daemon Configuration
+const DAEMON_URL = 'http://127.0.0.1:8008';
+let daemonActive = false;
+const client = io(DAEMON_URL, {
+    autoConnect: true,
+    reconnection: true,
+    reconnectionAttempts: 1,
+    timeout: 5000,
+    reconnectionDelay: 1000
+});
+
+// Export necessary variables for use in other modules
+export { client, daemonActive, databases };
+
+// Timeout to detect if initial connection fails
+const connectionTimeout = setTimeout(() => {
+    if (!client.connected) {
+        console.log(chalk.yellow('⚠️ Could not connect to daemon. Running in standalone mode.'));
+        daemonActive = false;
+        client.disconnect();
+        showMainMenu();
+    }
+}, 3000); // Wait 3 seconds for connection
+
+client.on('connect', () => {
+    clearTimeout(connectionTimeout);
+    daemonActive = true;
+    console.log(chalk.green('✅ Connected to daemon at ' + DAEMON_URL));
+    showMainMenu();
+});
+
+client.on('connect_error', (error) => {
+    clearTimeout(connectionTimeout);
+    console.log(chalk.red(`❌ Failed to connect to daemon: ${error.message}`));
+    daemonActive = false;
+    client.disconnect();
+    console.log(chalk.yellow('⚠️ Switching to standalone mode'));
+    showMainMenu();
+});
+
+// Add disconnect handler
+client.on('disconnect', (reason) => {
+    console.log(chalk.red(`❌ Disconnected from daemon: ${reason}`));
+    daemonActive = false;
+    console.log(chalk.yellow('⚠️ Switching to standalone mode'));
+    showMainMenu();
+});
+
+// Add reconnect_failed handler
+client.on('reconnect_failed', () => {
+    console.log(chalk.red('❌ Reconnection attempts failed'));
+    daemonActive = false;
+    client.disconnect(); // Ensure cleanup
+    console.log(chalk.yellow('⚠️ Running in standalone mode'));
+    showMainMenu();
+});
+
+client.on('response', (response) => {
+    if (response.response === 200) {
+        // console.log(chalk.green(`✅ ${response.message}`));
+    } else {
+        // console.log(chalk.red(`❌ ${response.message}`));
+    }
+
+    switch (response.type) {
+    case 'list':
+        console.log(chalk.blue.bold('\n📂 Available Databases:'));
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+            response.data.forEach(db => {
+                console.log(chalk.magenta(`  ├── 📁 ${db}`));
+            });
+        }
+
+        if (response.data.length <= 0) {
+            console.log(chalk.yellow('  └── (No Databases)'));
+            console.log('\n');
+        }
+
+        setTimeout(showMainMenu, 1000);
+        break;
+
+    default:
+        break;
+    }
+});
+
+// In-Memory Database (Supports Multiple DBs)
+const databases = {};
+
+nano Cli/Cli.js
+// CLI Interface
+const rl = readline.createInterface({ input, output });
+
+// Layout function for displaying menus
+function layout(menuText, menuType, bCol) {
+    console.log(boxen(menuText, {
+        float: 'center',
+        padding: { top: 1, bottom: 1, left: 1, right: 1 },
+        title: menuType,
+        titleAlignment: 'center',
+        borderColor: bCol,
+        borderStyle: 'round'
+    }));
+}
+let isExiting = false;
+// Display Main Menu
+export function showMainMenu() {
+    if (isExiting) return; 
+    const menuText = `
+1. Create 
+2. Read
+3. Update
+4. Delete
+5. Run Tests
+6. Exit
+    `;
+    layout(menuText, chalk.blue('📦 CQL Database CLI - Main Menu'), 'blue');
+
+    rl.question(chalk.yellow('Choose an option: '), (choice) => {
+        handleMainMenuChoice(choice);
+    });
+}
+// Handle Main Menu Choices
+function handleMainMenuChoice(choice) {
+    switch (choice.trim()) {
+    case '1':
+        showCreateMenu();
+        break;
+    case '2':
+        showReadMenu();
+        break;
+    case '3':
+        updateRecord();
+        break;
+    case '4':
+        deleteRecord();
+        break;
+    case '5':
+        runTests(showMainMenu);// Call the tests
+        break;
+    case '6':
+        exit();
+        break;
+    default:
+        console.log(chalk.red('⚠️ Invalid option! Please try again.'));
+        showMainMenu();
+    }
+}
+
+// Display Create Menu
+function showCreateMenu() {
+    const menuText = `
+1. New Database
+2. New Table
+3. New Record
+4. Return to previous menu
+    `;
+    layout(menuText, chalk.green('📦 CQL Database CLI - Create Menu'), 'green');
+
+    rl.question(chalk.yellow('Choose an option: '), (choice) => {
+        handleCreateMenuChoice(choice);
+    });
+}
+
+// Handle Create Menu Choices
+function handleCreateMenuChoice(choice) {
+    switch (choice.trim()) {
+    case '1':
+        createDatabase();
+        break;
+    case '2':
+        createTable();
+        break;
+    case '3':
+        insertRecord();
+        break;
+    case '4':
+        showMainMenu();
+        break;
+    default:
+        console.log(chalk.red('⚠️ Invalid option! Please try again.'));
+        showCreateMenu();
+    }
+}
+
+
+// Display Read Menu
+function showReadMenu() {
+    const menuText = `
+1. List All records 
+2. Retrieve record
+3. List Databases
+4. List Tables
+5. Return to previous menu
+    `;
+    layout(menuText, chalk.yellow('📦 CQL Database CLI - Read Menu'), 'green');
+
+    rl.question(chalk.yellow('Choose an option: '), (choice) => {
+        handleReadMenuChoice(choice);
+    });
+}
+
+// Handle Create Menu Choices
+function handleReadMenuChoice(choice) {
+    switch (choice.trim()) {
+    case '1':
+        showAll();
+        break;
+    case '2':
+        retrieveRecord();
+        break;
+    case '3':
+        retrieveDatabases();
+        break;
+    case '4':
+        retrieveTables();
+        break;
+    case '5':
+        showMainMenu();
+        break;
+    default:
+        console.log(chalk.red('⚠️ Invalid option! Please try again.'));
+        showReadMenu();
+    }
+}
+function saveDatabases(databases) {
+    fs.writeFileSync(dbFilePath, JSON.stringify(databases, null, 2), 'utf-8');
+}
+// Create Database
+export function createDatabase(name) {
+    if (!name) {
+        rl.question(chalk.yellow('Enter database name: '), (name) => {
+            if (!name) {
+                console.log(chalk.red('⚠️ Database name cannot be empty.'));
+                showMainMenu();
+                return;
+            }
+
+            if (daemonActive) {
+                const dataToSend = { [name]: {} };
+                // Emit the 'create' command to the daemon
+                client.emit('addCommand', 'create', dataToSend, (response) => {
+                    // Handle daemon response
+                    if (response.response === 200) {
+                        console.log(chalk.green(`✅ Database '${name}' created successfully in the daemon.`));
+                    } else {
+                        console.log(chalk.red(`❌ Failed to create database '${name}' in the daemon.`));
+                    }
+
+                    // After response, show database state
+                    showState('Test 1');
+                });
+                console.log(chalk.green(`✅ Database '${name}' created successfully in the daemon.`));
+                showMainMenu();
+            } else {
+                if (!databases[name]) {
+                    databases[name] = {};
+                    console.log(chalk.green(`✅ Database created locally: ${name}`));
+                    setTimeout(showCreateMenu, 2000);
+                } else {
+                    console.log(chalk.yellow(`⚠️ Database '${name}' already exists locally.`));
+                    setTimeout(showCreateMenu, 2000);
+                }
+            }
+        });
+    } else {
+        if (daemonActive) {
+            const dataToSend = { [name]: {} };
+            // Emit the 'create' command to the daemon
+            client.emit('addCommand', 'create', dataToSend, (response) => {
+                // Handle daemon response
+                if (response.response === 200) {
+                    console.log(chalk.green(`✅ Database '${name}' created successfully in the daemon.`));
+                } else {
+                    console.log(chalk.red(`❌ Failed to create database '${name}' in the daemon.`));
+                }
+
+                // After response, show database state
+                showState('Test 1');
+            });
+        } else {
+            if (!databases[name]) {
+                databases[name] = {};
+                console.log(chalk.green(`✅ Database created locally: ${name}`));
+                showState('Test 1');
+            } else {
+                console.log(chalk.yellow(`⚠️ Database '${name}' already exists locally.`));
+            }
+        }
+    }
+}
+
+// Create Table
+export  function createTable(dbName, tableName) {
+    if (!dbName || !tableName) {
+        rl.question(chalk.yellow('Enter database name: '), (dbName) => {
+            rl.question(chalk.yellow('Enter table name: '), (tableName) => {
+                if (!dbName || !tableName) {
+                    console.log(chalk.red('⚠️ Database and table names cannot be empty.'));
+                    showMainMenu();
+                    return;
+                }
+                if (daemonActive) {
+                    const dataToSend = { [dbName]: { [tableName]: {} } };
+                    client.emit('addCommand', 'create', dataToSend);
+                } else {
+                    if (!databases[dbName]) {
+                        console.log(chalk.yellow(`⚠️ Database '${dbName}' does not exist.`));
+                    } else if (!databases[dbName][tableName]) {
+                        databases[dbName][tableName] = {};
+                        console.log(chalk.green(`✅ Table '${tableName}' created in '${dbName}'.`));
+                    } else {
+                        console.log(chalk.yellow(`⚠️ Table '${tableName}' already exists.`));
+                    }
+                }
+                showMainMenu();
+            });
+        });
+    } else {
+        if (!databases[dbName]) {
+            console.log(chalk.yellow(`⚠️ Database '${dbName}' does not exist.`));
+        } else if (!databases[dbName][tableName]) {
+            databases[dbName][tableName] = {};
+            console.log(chalk.green(`✅ Table '${tableName}' created in '${dbName}'.`));
+        } else {
+            console.log(chalk.yellow(`⚠️ Table '${tableName}' already exists.`));
+        }
+    }
+}
+
+// Insert Record (Enhanced)
+export  function insertRecord(dbName, tableName) {
+    if (!dbName || !tableName) {
+        rl.question(chalk.yellow('Enter database name: '), (db) => {
+            rl.question(chalk.yellow('Enter table name: '), (table) => {
+                repetition(db, table);
+            });
+        });
+    } else {
+        repetition(dbName, tableName);
+    }
+}
+// Function that does the looping
+function repetition(dbName, tableName) {
+    rl.question(chalk.yellow('Number of Key Value Pairs to be added:  '), (count) => {
+        const numPairs = parseInt(count);
+        if (isNaN(numPairs) || numPairs <= 0) {
+            console.log(chalk.red('⚠️ Please enter a valid positive number.'));
+            showCreateMenu();
+            return;
+        }
+
+        let pairs = {};
+        let current = 0;
+
+        function askPair() {
+            if (current >= numPairs) {
+                // End loop
+                if (daemonActive) {
+                    const dataToSend = { [dbName]: { [tableName]: [pairs] } };
+                    client.emit('addCommand', 'create', dataToSend);
+                } else {
+                    if (!databases[dbName] || !databases[dbName][tableName]) {
+                        console.log(chalk.yellow('⚠️ Database/Table not found.'));
+                    } else {
+                        Object.entries(pairs).forEach(([key, value]) => {
+                            databases[dbName][tableName][key] = value;
+                            console.log(chalk.green(`✅ Inserted: ${key} = ${value} in ${dbName}.${tableName}`));
+                        });
+                    }
+                }
+                showCreateMenu();
+                return;
+            }
+
+            rl.question(chalk.yellow(`Enter key #${current + 1}: `), (key) => {
+                rl.question(chalk.yellow(`Enter value for "${key}": `), (value) => {
+                    if (!key || !value) {
+                        console.log(chalk.red('⚠️ Key and value cannot be empty.'));
+                        askPair(); // Retry current pair
+                        return;
+                    }
+                    pairs[key] = value;
+                    current++;
+                    askPair();
+                });
+            });
+        }
+
+        askPair(); // Start loop
+    });
+}
+
+
+// Retrieve Record function updated to align with the showAll style
+export  function retrieveRecord(dbName, tableName, key) {
+    // If any of the parameters are missing, prompt the user for them
+    if (!dbName || !tableName || !key) {
+        console.log(chalk.yellow('⚠️ Please provide the required details to retrieve the record.'));
+        
+        rl.question(chalk.yellow('Enter database name: '), (dbNameInput) => {
+            // If the database name is empty, go back to Read Menu
+            if (!dbNameInput) {
+                console.log(chalk.red('⚠️ Database name cannot be empty.'));
+                showReadMenu();
+                return;
+            }
+
+            rl.question(chalk.yellow('Enter table name: '), (tableNameInput) => {
+                // If the table name is empty, go back to Read Menu
+                if (!tableNameInput) {
+                    console.log(chalk.red('⚠️ Table name cannot be empty.'));
+                    showReadMenu();
+                    return;
+                }
+
+                rl.question(chalk.yellow('Enter key: '), (keyInput) => {
+                    // If the key is empty, go back to Read Menu
+                    if (!keyInput) {
+                        console.log(chalk.red('⚠️ Key cannot be empty.'));
+                        showReadMenu();
+                        return;
+                    }
+
+                    // Call retrieveRecord recursively with user inputs if all fields are valid
+                    retrieveRecord(dbNameInput, tableNameInput, keyInput);
+                });
+            });
+        });
+        return; // Exit early to await user input
+    }
+
+    // Check if the database exists in the loaded databases
+    if(daemonActive){
+        const databases = loadDatabases();
+        if (!databases[dbName]) {
+            console.log(chalk.red(`❌ Database '${dbName}' not found.`));
+            showReadMenu();
+            return;
+        }
+
+        // Check if the table exists within the specified database
+        const table = databases[dbName][tableName];
+        if (!table) {
+            console.log(chalk.red(`❌ Table '${tableName}' not found in database '${dbName}'.`));
+            showReadMenu();
+            return;
+        }
+
+        // Check if the key exists in the table
+        const value = databases[dbName][tableName][0][key];
+        //console.log(databases);
+        //console.log(JSON.stringify(value));
+        if (value === undefined) {
+            console.log(chalk.red(`❌ Key '${key}' not found in table '${tableName}' of database '${dbName}'.`));
+            showReadMenu();
+            return;
+        }
+
+        // Print the record in a formatted style, similar to showAll() method
+        console.log(chalk.blue.bold(`🔍 ${dbName}.${tableName}.${key} =`));
+        console.log(chalk.green(JSON.stringify(value, null, 2))); // Pretty-print the value
+    }
+    else{
+        if (!databases[dbName]) {
+            console.log(chalk.red(`❌ Database '${dbName}' not found.`));
+            showReadMenu();
+            return;
+        }
+
+        // Check if the table exists within the specified database
+        const table = databases[dbName][tableName];
+        if (!table) {
+            console.log(chalk.red(`❌ Table '${tableName}' not found in database '${dbName}'.`));
+            showReadMenu();
+            return;
+        }
+
+        // Check if the key exists in the table
+        const value = databases[dbName][tableName][0][key];
+        //console.log(databases);
+        //console.log(JSON.stringify(value));
+        if (value === undefined) {
+            console.log(chalk.red(`❌ Key '${key}' not found in table '${tableName}' of database '${dbName}'.`));
+            showReadMenu();
+            return;
+        }
+
+        // Print the record in a formatted style, similar to showAll() method
+        console.log(chalk.blue.bold(`🔍 ${dbName}.${tableName}.${key} =`));
+        console.log(chalk.green(JSON.stringify(value, null, 2))); // Pretty-print the value
+    }
+    
+
+    // Go back to the Read Menu after displaying the record
+    showReadMenu();
+}
+
+
+
+
+//Retrieve tables
+function retrieveTables(dbName) {
+    if (!dbName) {
+        rl.question(chalk.yellow('Enter database name: '), (dbName) => {
+            if (!dbName) {
+                console.log(chalk.red('⚠️ Database name required.'));
+                showMainMenu();
+                return;
+            }
+            if (daemonActive) {
+                const dataToSend = { [dbName]: {} };
+                client.emit('addCommand', 'list', dataToSend);
+                const databases = loadDatabases();
+                const tables = databases[dbName];
+                if (!tables) {
+                    console.log(chalk.red(`❌ Database '${dbName}' not found.`));
+                    showMainMenu();
+                    return;
+                }
+                console.log(chalk.blue.bold(`📂 Tables in ${dbName}:`));
+                Object.keys(tables).forEach(table => {
+                    console.log(chalk.magenta(`  ├── 📄 ${table}`));
+                });
+                if (Object.keys(tables).length === 0) {
+                    console.log(chalk.yellow('  └── (No Tables)'));
+                }
+                setTimeout(showReadMenu, 2000);
+            } else {
+                const value = databases[dbName];
+                if(!value) {
+                    console.log(chalk.red(`❌ Database '${dbName}' not found.`));
+                    showMainMenu();
+                    return;
+                }
+                console.log(chalk.blue.bold(`📂 Tables in ${dbName}:`));
+                Object.keys(value).forEach(table => {
+                    console.log(chalk.magenta(`  ├── 📄 ${table}`));
+                });
+                if (Object.keys(value).length === 0) {
+                    console.log(chalk.yellow('  └── (No Tables)'));
+                }
+                setTimeout(showReadMenu, 2000);
+            }
+            //showMainMenu();
+        });
+    } else {
+        const value = databases[dbName];
+        console.log(value !== undefined ? chalk.blue(`🔍 ${dbName}.`) : chalk.red('❌ No tables found.'));
+    }
+}
+
+// Retrieve Databases
+function retrieveDatabases() {
+    if (daemonActive) {
+        client.emit('addCommand', 'list', '');
+        const databases = loadDatabases();
+        console.log(chalk.blue('\n📂 Available Databases:'));
+        if (Object.keys(databases).length === 0) {
+            console.log(chalk.yellow('  └── (No Databases)'));
+        } else {
+            Object.keys(databases).forEach(db => {
+                console.log(chalk.magenta(`  ├── 📁 ${db}`));
+            });
+        }
+        setTimeout(showReadMenu, 2000);
+    } else {
+        console.log(chalk.blue('\n📂 Available Databases:'));
+        
+        if (Object.keys(databases).length === 0) {
+            console.log(chalk.yellow('  └── (No Databases)'));
+        } else {
+            Object.keys(databases).forEach(db => {
+                console.log(chalk.magenta(`  ├── 📁 ${db}`));
+            });
+        }
+        setTimeout(showMainMenu, 2000);
+    }
+    // showMainMenu(); This is called after response from server. No need to call it here
+}
+
+// Update Record
+export async function updateRecord(dbName, tableName, key, newValue) {
+    if (!dbName || !tableName || !key || !newValue) {
+        rl.question(chalk.yellow('Enter database name: '), (dbName) => {
+            rl.question(chalk.yellow('Enter table name: '), (tableName) => {
+                rl.question(chalk.yellow('Enter key: '), (key) => {
+                    rl.question(chalk.yellow('Enter new value: '), (newValue) => {
+                        if (!dbName || !tableName || !key || !newValue) {
+                            console.log(chalk.red('⚠️ All fields are required.'));
+                            return showMainMenu();
+                        }
+                        processUpdate(dbName, tableName, key, newValue);
+                    });
+                });
+            });
+        });
+    } else {
+        processUpdate(dbName, tableName, key, newValue);
+    }
+}
+
+// Process Update with debug logs
+function processUpdate(dbName, tableName, key, newValue) {
+    console.log(chalk.blue(`Attempting to update record in ${dbName}.${tableName}: ${key} = ${newValue}`));
+
+    if (daemonActive) {
+        const dataToSend = { [dbName]: { [tableName]: { [key]: [newValue] } } };
+        console.log(chalk.green('Sending to Daemon:', JSON.stringify(dataToSend, null, 2)));
+        client.emit('addCommand', 'update', dataToSend);
+    } else {
+        // Check if the database exists
+        if (!databases[dbName]) {
+            console.log(chalk.red(`❌ Database '${dbName}' not found.`));
+            showMainMenu();
+            return;
+        }
+
+        // Check if the table exists
+        const table = databases[dbName][tableName];
+        if (!table) {
+            console.log(chalk.red(`❌ Table '${tableName}' not found in database '${dbName}'.`));
+            showMainMenu();
+            return;
+        }
+
+        // Check if the key exists in the table
+        if (table[key] === undefined) {
+            console.log(chalk.yellow(`⚠️ Key '${key}' not found in table '${tableName}' of database '${dbName}'.`));
+        } else {
+            // Update the value
+            table[key] = newValue;
+            console.log(chalk.green(`✅ Updated: ${dbName}.${tableName}.${key} = ${newValue}`));
+        }
+    }
+    showMainMenu();
+}
+
+// Delete Record
+export  function deleteRecord(dbName, tableName, key) {
+    if (!dbName || !tableName || !key) {
+        rl.question(chalk.yellow('Enter database name: '), (dbName) => {
+            rl.question(chalk.yellow('Enter table name: '), (tableName) => {
+                rl.question(chalk.yellow('Enter key: '), (key) => {
+                    if (!dbName || !tableName || !key) {
+                        console.log(chalk.red('⚠️ All fields are required.'));
+                        showMainMenu();
+                        return;
+                    }
+                    if (daemonActive) {
+
+                        client.emit('addCommand', 'delete', `${dbName}{${tableName}{${key}}}`);
+                    } else {
+                        if (databases[dbName]?.[tableName]?.[key]) {
+                            delete databases[dbName][tableName][key];
+                            console.log(chalk.red(`🗑️ Deleted: ${dbName}.${tableName}.${key}`));
+                        } else {
+                            console.log(chalk.yellow(`⚠️ Key '${key}' not found.`));
+                        }
+                    }
+                    showMainMenu();
+                });
+            });
+        });
+    } else {
+        if (databases[dbName]?.[tableName]?.[key]) {
+            delete databases[dbName][tableName][key];
+            console.log(chalk.red(`🗑️ Deleted: ${dbName}.${tableName}.${key}`));
+        } else {
+            console.log(chalk.yellow(`⚠️ Key '${key}' not found.`));
+        }
+    }
+}
+function loadDatabases() {
+    const __dirname = path.dirname(new URL(import.meta.url).pathname);  // Get the directory name
+<<<<<<< HEAD
+    const dataDir = decodeURIComponent(path.join(__dirname,"..", 'data'));  // Path to 'data' directory
+=======
+    const dataDir = decodeURIComponent(path.join(__dirname, '..', 'data'));  // Path to 'data' directory
+>>>>>>> 8c57d991a48834822aae7d953348a7e609f5867d
+    cons
+
+t dbs = {};
+
+    // Read all directories inside 'data' directory (representing databases)
+    const dbDirs = fs.readdirSync(dataDir);
+
+    dbDirs.forEach(dbName => {
+        const dbPath = path.join(dataDir, dbName);
+        if (fs.statSync(dbPath).isDirectory()) {
+            const tables = {};
+
+            // Read all directories inside each database directory (tables)
+            const tableDirs = fs.readdirSync(dbPath);
+
+            tableDirs.forEach(tableDir => {
+                const tablePath = path.join(dbPath, tableDir);
+
+                // Check if this is a table directory containing any .json file (wildcard)
+                const contentFiles = fs.readdirSync(tablePath).filter(file => file.endsWith('.json'));
+
+                if (contentFiles.length > 0) {
+                    contentFiles.forEach(contentFile => {
+                        const contentPath = path.join(tablePath, contentFile);
+                        const tableData = JSON.parse(fs.readFileSync(contentPath, 'utf-8'));
+
+                        // Add data to the table entry
+                        if (!tables[tableDir]) tables[tableDir] = [];
+                        tables[tableDir].push(tableData);
+                    });
+                }
+            });
+
+            dbs[dbName] = tables;
+        }
+    });
+
+    return dbs;
+}
+
+// Updated showAll function without debug logs
+export function showAll() {
+    if(daemonActive){
+        const databases = loadDatabases();
+        if (Object.keys(databases).length === 0) {
+            console.log(chalk.yellow('⚠️ No data stored yet.'));
+            return setTimeout(showMainMenu, 2000);
+        }
+
+        console.log(chalk.blue.bold('\n📂 Databases Overview\n'));
+
+        for (const dbName in databases) {
+            console.log(chalk.magenta.bold(`📁 ${dbName}`));
+
+            const tables = databases[dbName];
+
+            if (Object.keys(tables).length === 0) {
+                console.log(chalk.gray('  └── (No Tables)\n'));
+            } else {
+                for (const tableName in tables) {
+                    console.log(chalk.green(`  ├── 📄 ${tableName}`));
+
+                    const records = tables[tableName];
+
+                    if (Object.keys(records).length === 0) {
+                        console.log(chalk.gray('  │    └── (No Records)'));
+                    } else {
+                        const table = new Table({
+                            head: [
+                                chalk.cyan.bold('Key'),
+                                chalk.yellow.bold('Value')
+                            ],
+                            colWidths: [30, 50],
+                            style: { head: [], border: [] }
+                        });
+
+                        // Loop through each key-value pair in the content.json data
+                        records.forEach(record => {
+                            Object.entries(record).forEach(([key, value]) => {
+                                // Check if the value is an object, and then stringify it
+                                if (typeof value === 'object' && value !== null) {
+                                    value = JSON.stringify(value, null, 2); // Stringify the object for readable output
+                                }
+
+                                // Handle special fields like 'id' and '_createdAt'
+                                if (key === 'id' || key === '_createdAt') {
+                                    table.push([chalk.cyan(key), chalk.yellow(value)]);
+                                } else {
+                                    table.push([chalk.blue(key), chalk.green(value)]);
+                                }
+                            });
+                        });
+
+                        console.log(table.toString());
+                    }
+                    console.log('\n');
+                }
+            }
+        }
+    }
+    else{
+        
+    }
+    setTimeout(showMainMenu, 2000);
+}
+
+
+
+
+// Show Help
+// function showHelp() {
+//     const menuText = `
+// 📌 Available Commands:
+//    1. Create Database
+//    2. Create Table
+//    3. Insert Record
+//    4. Retrieve Record
+//    5. Delete Record
+//    6. Show All
+//    7. Help
+//    8. Exit
+//    9. Run Tests
+//     `;
+//     layout(menuText, 'Help Menu', 'cyan');
+//     showMainMenu();
+// }
+
+// Exit
+function exit() {
+    if (isExiting) return; 
+    isExiting = true;
+    console.log(chalk.red('\n🚪 Exiting CQL CLI...'));
+    rl.close();
+    client.disconnect();
+    process.exit(0);
+}
+
+//  function runTests() {
+//     console.clear();
+//     console.log(chalk.blue('🚀 Running Tests...\n'));
+
+//     // Test 1: Create Multiple Databases
+//     console.log(chalk.yellow('\nTest 1: Creating Multiple Databases...'));
+//     await createDatabase('UserDB');
+//     await createDatabase('ProductDB');
+//     console.log(chalk.green('✅ Test 1 Passed: Databases created successfully.'));
+
+//     // Show Database State
+//     console.log(chalk.yellow('Showing Database State After Test 1...'));
+//     showAll();
+//     await new Promise((resolve) => setTimeout(resolve, 4000));
+
+//     // Test 2: Create Multiple Tables in Each Database
+//     console.log(chalk.yellow('\nTest 2: Creating Multiple Tables...'));
+//     await createTable('UserDB', 'Users');
+//     await createTable('UserDB', 'Admins');
+//     await createTable('ProductDB', 'Products');
+//     await createTable('ProductDB', 'Categories');
+//     console.log(chalk.green('✅ Test 2 Passed: Tables created successfully.'));
+
+//     // Show Database State
+//     console.log(chalk.yellow('Showing Database State After Test 2...'));
+//     showAll();
+//     await new Promise((resolve) => setTimeout(resolve, 4000));
+
+//     // Test 3: Insert Multiple Records
+//     console.log(chalk.yellow('\nTest 3: Inserting Multiple Records...'));
+//     await insertRecord('UserDB', 'Users', 'user1', 'Alice');
+//     await insertRecord('UserDB', 'Users', 'user2', 'Bob');
+//     await insertRecord('UserDB', 'Admins', 'admin1', 'Charlie');
+//     await insertRecord('ProductDB', 'Products', 'product1', 'Laptop');
+//     await insertRecord('ProductDB', 'Products', 'product2', 'Smartphone');
+//     await insertRecord('ProductDB', 'Categories', 'category1', 'Electronics');
+//     console.log(chalk.green('✅ Test 3 Passed: Records inserted successfully.'));
+
+//     // Show Database State
+//     console.log(chalk.yellow('Showing Database State After Test 3...'));
+//     showAll();
+//     await new Promise((resolve) => setTimeout(resolve, 4000));
+
+//     // Test 4: Update Existing Records
+//     console.log(chalk.yellow('\nTest 4: Updating Records...'));
+//     await updateRecord('UserDB', 'Users', 'user1', 'Alice Johnson');
+//     await updateRecord('ProductDB', 'Products', 'product2', 'Smartphone (Updated)');
+//     console.log(chalk.green('✅ Test 4 Passed: Records updated successfully.'));
+
+//     // Show Database State
+//     console.log(chalk.yellow('Showing Database State After Test 4...'));
+//     showAll();
+//     await new Promise((resolve) => setTimeout(resolve, 4000));
+
+//     // Test 5: Retrieve Specific Records
+//     console.log(chalk.yellow('\nTest 5: Retrieving Specific Records...'));
+//     await retrieveRecord('UserDB', 'Users', 'user1');
+//     await retrieveRecord('ProductDB', 'Products', 'product2');
+//     console.log(chalk.green('✅ Test 5 Passed: Records retrieved successfully.'));
+
+//     // Test 6: Delete Specific Records
+//     console.log(chalk.yellow('\nTest 6: Deleting Records...'));
+//     await deleteRecord('UserDB', 'Users', 'user2');
+//     await deleteRecord('ProductDB', 'Products', 'product1');
+//     console.log(chalk.green('✅ Test 6 Passed: Records deleted successfully.'));
+
+//     // Show Database State
+//     console.log(chalk.yellow('Showing Database State After Test 6...'));
+//     showAll();
+//     await new Promise((resolve) => setTimeout(resolve, 4000));
+
+//     console.log(chalk.blue('\n🎉 All Tests Passed!'));
+//     await new Promise((resolve) => setTimeout(resolve, 4000));
+//     showMainMenu();
+// }
+
+// Start CLI
+//showMainMenu();

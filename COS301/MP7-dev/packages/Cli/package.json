@@ -1,0 +1,19 @@
+{
+    "name": "@mp7/cli",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+      "start": "node ./src/Cli.js",
+      "testCLI": "node ./packageCli/tests/cli_tests.js"
+    },
+    "dependencies": {
+      "socket.io-client": "^4.8.1",
+      "boxen": "^8.0.1",
+      "cli-table3": "^0.6.5"
+  
+    },
+    "devDependencies": {
+      "jsdoc": "^4.0.4"
+    }
+  }

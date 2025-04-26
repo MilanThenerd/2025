@@ -1,0 +1,75 @@
+{
+    "name": "mp7",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "NoSQL Database Management System",
+    "private": true,
+    "scripts": {
+        "start": "npm run start --workspace=@mp7/ui",
+        "start:api": "npm run start --workspace=@mp7/api",
+        "start:daemon": "npm run start --workspace=@mp7/daemon",
+        "start:cli": "npm run start --workspace=@mp7/cli",
+        "start:all": "concurrently \"npm run start:daemon\" \"npm run start:api\" \"npm run start:ui\"",
+        "start:ui": "npm run start --workspace=@mp7/ui",
+        "build": "npm run build --workspaces",
+        "dev": "npm run start:all",
+        
+        "test": "npm run test:unit",
+        "test:unit": "jest packages/JS_library/tests/useCase.test.js packages/JS_library/tests/apiLibrary.tests.js ",
+        "test:integration": "jest \"**/*.integration.test.js\"",
+        "pretest:integration": "node scripts/start-test-services.js",
+        "posttest:integration": "node scripts/stop-test-services.js",
+        "test:manual": "node scripts/run-manual-tests.js",
+        "test:jest": "jest packages/JS_library/tests/useCase.test.js packages/JS_library/tests/apiLibrary.tests.js packages/JS_library/tests/apiImplementation.test.js packages/api/tests/integration.test.js packages/api/tests/mpdb-api.test.js",
+        "test:all": "npm run test:unit && npm run test:integration && npm run test:manual",
+        
+        "test:daemon": "npm run test --workspace=@mp7/daemon",
+        "test:api": "npm run test --workspace=@mp7/api",
+        "test:cli": "npm run test --workspace=@mp7/cli",
+        "test:js-lib": "npm run test --workspace=@mp7/js_library",
+        "test:ui": "npm run test --workspace=@mp7/ui",
+        
+        "lint": "eslint --config eslint.config.js .",
+        "lint:fix": "eslint --config eslint.config.js . --fix",
+        "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
+        "docs": "jsdoc -c jsdoc.conf.json",
+        "clean": "rimraf packages/*/node_modules node_modules"
+    },
+    "workspaces": [
+        "packages/api",
+        "packages/Cli",
+        "packages/daemon",
+        "packages/JS_library",
+        "packages/UI"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/COS301-SE-2025/MP7.git"
+    },
+    "bugs": {
+        "url": "https://github.com/COS301-SE-2025/MP7/issues"
+    },
+    "homepage": "https://github.com/COS301-SE-2025/MP7#readme",
+    "dependencies": {
+        "async-mutex": "^0.5.0",
+        "socket.io": "^4.8.1",
+        "socket.io-client": "^4.8.1"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "@eslint/js": "^8.57.0",
+        "eslint": "^8.57.1",
+        "eslint-plugin-react": "^7.34.0",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "eslint-plugin-react-refresh": "^0.4.5",
+        "globals": "^14.0.0",
+        "jsdoc": "^4.0.4",
+        "concurrently": "^8.2.2",
+        "prettier": "^3.2.5",
+        "rimraf": "^5.0.5"
+    },
+    "engines": {
+        "node": ">=18.0.0",
+        "npm": ">=9.0.0"
+    }
+}

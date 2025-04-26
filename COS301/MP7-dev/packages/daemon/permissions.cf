@@ -1,0 +1,23 @@
+{
+  "m9t1v9fc": {
+    "role": "admin",
+    "databases": "*"
+  },
+  "m9u4w456": {
+    "role": "user",
+    "databases": {
+      "testDB": [
+        "read",
+        "write"
+      ]
+    }
+  },
+  "m9uhm3sg": {
+    "role": "user",
+    "databases": {}
+  },
+  "m9vwr8mh": {
+    "role": "admin",
+    "databases": {}
+  }
+}
