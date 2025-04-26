@@ -1,0 +1,102 @@
+.createDatabaseContainer {
+    
+    background-color: #f9f0ff; /* Light purple background */
+    border: 2px solid #6b21a8; /* Purple border */
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    top: 50%;
+    left: 50%;
+    transform: translate(5%,85%);
+  }
+  
+  .createDatabaseContainer h2 {
+    color: #6b21a8; /* Purple heading */
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .createDatabaseForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .createDatabaseForm label {
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .createDatabaseForm input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #6b21a8;
+    border-radius: 5px;
+    outline: none;
+  }
+  
+  .createDatabaseForm input:focus {
+    border-color: #9333ea;
+    box-shadow: 0 0 5px rgba(147, 51, 234, 0.5);
+  }
+  
+  .formActions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .createButton,
+  .cancelButton {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .createButton {
+    background-color: #6b21a8;
+    color: white;
+  }
+  
+  .createButton:hover {
+    background-color: #9333ea;
+  }
+  
+  .cancelButton {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .cancelButton:hover {
+    background-color: #b02a37;
+  }
+  
+  /* Dark mode styles */
+  .appContainer.darkMode .createDatabaseContainer {
+    background-color: #2d1b4e; /* Darker purple for dark mode */
+    border-color: #a78bfa;
+  }
+  
+  .appContainer.darkMode .createDatabaseContainer h2 {
+    color: #a78bfa;
+  }
+  
+  .appContainer.darkMode .createDatabaseForm label {
+    color: #e0e0e0;
+  }
+  
+  .appContainer.darkMode .createDatabaseForm input {
+    background-color: #3f3f46;
+    border-color: #a78bfa;
+    color: #e0e0e0;
+  }
+  
+  .appContainer.darkMode .createDatabaseForm input:focus {
+    border-color: #c4b5fd;
+    box-shadow: 0 0 5px rgba(196, 181, 253, 0.5);
+  }

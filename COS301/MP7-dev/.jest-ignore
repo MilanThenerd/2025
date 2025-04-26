@@ -1,0 +1,20 @@
+# Paths to ignore in Jest tests
+# One path per line, use standard glob patterns
+# Lines starting with # are comments
+
+# Node modules
+**/node_modules/**
+
+# Build output
+**/dist/**
+**/build/**
+
+# Cache files
+**/.cache/**
+
+# Coverage reports
+**/coverage/**
+
+# Test data files
+**/test-data/**
+**/App.test/**
