@@ -1,4 +1,0 @@
-# Base DN
-dn: c=AU
-c: AU
-objectclass: country
