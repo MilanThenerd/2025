@@ -835,7 +835,7 @@ int main()
   std::vector<GLfloat> floorVerts = vertices("./assets/itKiosk.txt");
   std::vector<GLfloat> floorColor = getColor("./assets/itKiosk_color.txt", false);
   std::vector<GLfloat> floorNormals = vertices("./assets/itKiosk_normals.txt");
-  Polyhedrons floorplan(floorVerts, floorColor, floorNormals);
+  Polyhedrons floorplan(floorVerts, getColor(0.1 , 0.1 , 0.1, 100000), floorNormals);
 
   
   floorplan.upload();
@@ -843,7 +843,7 @@ int main()
   floorplan.rotate(90.0f, 0.0f, 0.0f);
 
   std::vector<GLfloat> glassWallVerts = vertices("./assets/glassWall.txt");
-  std::vector<GLfloat> glassWallColor = getColor(1.0f , 1.0f , 1.0f , glassWallVerts.size() / 3 , 0.2f);
+  std::vector<GLfloat> glassWallColor = getColor(1.0f , 0.0f , 0.0f , glassWallVerts.size() / 3 , 0.2f);
   Polyhedrons glassWall(glassWallVerts, glassWallColor, std::vector<GLfloat>() , true);
 
   glassWall.rotate(90.0f , 0.0f , 0.0f);

@@ -35,6 +35,11 @@ inline void startUpGLEW()
   }
 }
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+  glViewport(0, 0, width, height);
+}
+
+
 inline GLFWwindow *setUp(int width = 1000, int height = 1000, float red = 0.0f, float green = 0.0f, float blue = 0.0f, float alpha = 1.0f)
 {
   startUpGLFW();
@@ -52,6 +57,7 @@ inline GLFWwindow *setUp(int width = 1000, int height = 1000, float red = 0.0f, 
     throw "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n";
   }
   glfwMakeContextCurrent(window); // Initialize GLEW
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glClearColor(red, green, blue, alpha);
   startUpGLEW();
   return window;
@@ -723,83 +729,83 @@ void handleKeyPresses(GLFWwindow *window, int &type, int &index,
 }
 int main()
 {
-  GLFWwindow *window = setUp(1000, 1000, 0.3f, 0.3f, 0.3f, 1.0f);
+  GLFWwindow *window = setUp(1000,1000, 0.3f, 0.3f, 0.3f, 1.0f);
   GLuint programID = LoadShaders("vertex.glsl", "fragment.glsl");
   GLuint VertexArrayID;
   glGenVertexArrays(1, &VertexArrayID);
   glBindVertexArray(VertexArrayID);
 
-  GLfloat floorVertices[] = {-0.8f, -0.8f, 0.0f, 0.8f, -0.8f, 0.0f, -0.8f, 0.8f, 0.0f, 0.8f, 0.8f, 0.0f};
+  GLfloat floorVertices[] = {-0.97f, -0.33f, 0.0f, 0.97f, -0.33f, 0.0f, -0.97f, 0.33f, 0.0f, 0.97f, 0.33f, 0.0f};
   GLfloat floorColors[12];
   getColor(1.0f, 0.5f, 0.0f, 4, floorColors);
   Square floor(floorVertices, floorColors, 4);
   floor.upload();
 
-  GLfloat doorVertices[] = {-0.1f, -0.8f, 0.0f, 0.1f, -0.8f, 0.0f, -0.1f, -0.75f, 0.0f, 0.1f, -0.75f, 0.0f};
-  GLfloat doorColors[12];
-  getColor(0.5f, 0.5f, 0.5f, 4, doorColors);
-  doors[doorCount++] = Square(doorVertices, doorColors, 4);
-  doors[doorCount - 1].move(-0.3f, 0.0f);
+  // GLfloat doorVertices[] = {-0.1f, -0.8f, 0.0f, 0.1f, -0.8f, 0.0f, -0.1f, -0.75f, 0.0f, 0.1f, -0.75f, 0.0f};
+  // GLfloat doorColors[12];
+  // getColor(0.5f, 0.5f, 0.5f, 4, doorColors);
+  // doors[doorCount++] = Square(doorVertices, doorColors, 4);
+  // doors[doorCount - 1].move(-0.3f, 0.0f);
 
-  GLfloat plantVertices[] = {-0.05f, -0.05f, 0.0f, 0.05f, -0.05f, 0.0f, 0.0f, 0.05f, 0.0f};
-  GLfloat plantColors[9];
-  getColor(0.0f, 1.0f, 0.0f, 3, plantColors);
-  for (int i = 0; i < 6; i++)
-  {
-    plants[plantCount++] = Triangle(plantVertices, plantColors, 3);
-  }
+  // GLfloat plantVertices[] = {-0.05f, -0.05f, 0.0f, 0.05f, -0.05f, 0.0f, 0.0f, 0.05f, 0.0f};
+  // GLfloat plantColors[9];
+  // getColor(0.0f, 1.0f, 0.0f, 3, plantColors);
+  // for (int i = 0; i < 6; i++)
+  // {
+  //   plants[plantCount++] = Triangle(plantVertices, plantColors, 3);
+  // }
 
-  GLfloat postVertices[] = {-0.05f, -0.05f, 0.0f, 0.05f, -0.05f, 0.0f, -0.05f, 0.05f, 0.0f, 0.05f, 0.05f, 0.0f};
-  GLfloat postColors[12];
-  getColor(0.5f, 0.5f, 0.5f, 4, postColors);
-  posts[postCount++] = Square(postVertices, postColors, 4);
-  posts[postCount - 1].move(0.7f, -0.7f);
+  // GLfloat postVertices[] = {-0.05f, -0.05f, 0.0f, 0.05f, -0.05f, 0.0f, -0.05f, 0.05f, 0.0f, 0.05f, 0.05f, 0.0f};
+  // GLfloat postColors[12];
+  // getColor(0.5f, 0.5f, 0.5f, 4, postColors);
+  // posts[postCount++] = Square(postVertices, postColors, 4);
+  // posts[postCount - 1].move(0.7f, -0.7f);
 
-  GLfloat tableVertices[] = {-0.2f, 0.2f, 0.0f, 0.2f, 0.2f, 0.0f, -0.2f, 0.3f, 0.0f, 0.2f, 0.3f, 0.0f};
-  GLfloat tableColors[12];
-  getColor(0.0f, 0.0f, 1.0f, 4, tableColors);
-  tables[tableCount++] = Square(tableVertices, tableColors, 4);
+  // GLfloat tableVertices[] = {-0.2f, 0.2f, 0.0f, 0.2f, 0.2f, 0.0f, -0.2f, 0.3f, 0.0f, 0.2f, 0.3f, 0.0f};
+  // GLfloat tableColors[12];
+  // getColor(0.0f, 0.0f, 1.0f, 4, tableColors);
+  // tables[tableCount++] = Square(tableVertices, tableColors, 4);
 
-  GLfloat seatingVertices[3 * (52 + 1)];
-  createCircle(50, 0.1f, seatingVertices);
-  GLfloat seatingColors[3 * 52];
-  getColor(0.5f, 0.0f, 0.5f, 52, seatingColors);
-  seating[seatingCount++] = Circle(seatingVertices, seatingColors, 52);
+  // GLfloat seatingVertices[3 * (52 + 1)];
+  // createCircle(50, 0.1f, seatingVertices);
+  // GLfloat seatingColors[3 * 52];
+  // getColor(0.5f, 0.0f, 0.5f, 52, seatingColors);
+  // seating[seatingCount++] = Circle(seatingVertices, seatingColors, 52);
 
-  GLfloat seatingVerticesLow[3 * (12)];
-  createCircle(10, 0.1f, seatingVerticesLow);
-  GLfloat seatingColorsLow[3 * 12];
-  getColor(0.5f, 0.0f, 0.5f, 12, seatingColorsLow);
-  seating[seatingCount++] = Circle(seatingVerticesLow, seatingColorsLow, 12);
+  // GLfloat seatingVerticesLow[3 * (12)];
+  // createCircle(10, 0.1f, seatingVerticesLow);
+  // GLfloat seatingColorsLow[3 * 12];
+  // getColor(0.5f, 0.0f, 0.5f, 12, seatingColorsLow);
+  // seating[seatingCount++] = Circle(seatingVerticesLow, seatingColorsLow, 12);
 
-  GLfloat entryDoorVertices[] = {-0.2f, -0.8f, 0.0f, 0.2f, -0.8f, 0.0f, -0.2f, -0.7f, 0.0f, 0.2f, -0.7f, 0.0f};
-  GLfloat entryDoorColors[12];
-  getColor(0.5f, 0.5f, 0.5f, 4, entryDoorColors);
-  entryDoors[entryDoorCount++] = EntryDoor(entryDoorVertices, entryDoorColors, 4);
-  entryDoors[entryDoorCount - 1].move(-0.5f, 0.0f);
+  // GLfloat entryDoorVertices[] = {-0.2f, -0.8f, 0.0f, 0.2f, -0.8f, 0.0f, -0.2f, -0.7f, 0.0f, 0.2f, -0.7f, 0.0f};
+  // GLfloat entryDoorColors[12];
+  // getColor(0.5f, 0.5f, 0.5f, 4, entryDoorColors);
+  // entryDoors[entryDoorCount++] = EntryDoor(entryDoorVertices, entryDoorColors, 4);
+  // entryDoors[entryDoorCount - 1].move(-0.5f, 0.0f);
 
-  GLfloat counterVertices[] = {-0.3f, 0.6f, 0.0f, 0.3f, 0.6f, 0.0f, -0.3f, 0.7f, 0.0f, 0.3f, 0.7f, 0.0f};
-  GLfloat counterColors[12];
-  getColor(0.0f, 0.0f, 1.0f, 4, counterColors);
-  counters[counterCount++] = Counter(counterVertices, counterColors, 4);
+  // GLfloat counterVertices[] = {-0.3f, 0.6f, 0.0f, 0.3f, 0.6f, 0.0f, -0.3f, 0.7f, 0.0f, 0.3f, 0.7f, 0.0f};
+  // GLfloat counterColors[12];
+  // getColor(0.0f, 0.0f, 1.0f, 4, counterColors);
+  // counters[counterCount++] = Counter(counterVertices, counterColors, 4);
 
-  GLfloat benchVertices[] = {-0.2f, 0.4f, 0.0f, 0.2f, 0.4f, 0.0f, -0.2f, 0.5f, 0.0f, 0.2f, 0.5f, 0.0f};
-  GLfloat benchColors[12];
-  getColor(0.5f, 0.3f, 0.1f, 4, benchColors);
-  for (int i = 0; i < maxBenches; i++)
-  {
-    benches[benchCount++] = Bench(benchVertices, benchColors, 4);
-    benches[benchCount - 1].move(0.0f, -0.2f * i);
-  }
+  // GLfloat benchVertices[] = {-0.2f, 0.4f, 0.0f, 0.2f, 0.4f, 0.0f, -0.2f, 0.5f, 0.0f, 0.2f, 0.5f, 0.0f};
+  // GLfloat benchColors[12];
+  // getColor(0.5f, 0.3f, 0.1f, 4, benchColors);
+  // for (int i = 0; i < maxBenches; i++)
+  // {
+  //   benches[benchCount++] = Bench(benchVertices, benchColors, 4);
+  //   benches[benchCount - 1].move(0.0f, -0.2f * i);
+  // }
 
-  GLfloat dustbinVertices[] = {-0.05f, -0.05f, 0.0f, 0.05f, -0.05f, 0.0f, -0.05f, 0.05f, 0.0f, 0.05f, 0.05f, 0.0f};
-  GLfloat dustbinColors[12];
-  getColor(0.3f, 0.3f, 0.3f, 4, dustbinColors);
-  for (int i = 0; i < maxDustbins; i++)
-  {
-    dustbins[dustbinCount++] = Dustbin(dustbinVertices, dustbinColors, 4);
-    dustbins[dustbinCount - 1].move(0.6f, -0.6f + 0.2f * i);
-  }
+  // GLfloat dustbinVertices[] = {-0.05f, -0.05f, 0.0f, 0.05f, -0.05f, 0.0f, -0.05f, 0.05f, 0.0f, 0.05f, 0.05f, 0.0f};
+  // GLfloat dustbinColors[12];
+  // getColor(0.3f, 0.3f, 0.3f, 4, dustbinColors);
+  // for (int i = 0; i < maxDustbins; i++)
+  // {
+  //   dustbins[dustbinCount++] = Dustbin(dustbinVertices, dustbinColors, 4);
+  //   dustbins[dustbinCount - 1].move(0.6f, -0.6f + 0.2f * i);
+  // }
 
   int type = 0;
   int index = 0;

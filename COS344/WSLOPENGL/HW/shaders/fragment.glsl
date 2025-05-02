@@ -16,7 +16,7 @@ vec4 spotLight() {
     float outerCone = 0.90f;
     float innerCone = 0.95f;
 
-    vec3 normal = normalize(fragNormal);
+    vec3 normal = normalize(vec3(0.0 , 1.0 , 0.0));
     vec3 lightVec = lightPos - crntPos;
     float dist = length(lightVec);
     vec3 lightDir = normalize(lightVec);
@@ -51,7 +51,7 @@ void main()
 {
     if (!lightEnabled) 
     {
-      float ambient = 0.20f;
+      float ambient = 0.2f;
       vec3 base = fragmentCol.rgb;
       vec3 lit = base * ambient;
       fragColor = vec4(lit, fragmentCol.a);
