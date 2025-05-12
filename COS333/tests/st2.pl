@@ -16,3 +16,17 @@ ownsSharedProperty(X) :-
     address(Tenant2, Addr).  
 
 :- ownsSharedProperty(X), writeln(X).
+
+
+countNonMatching(_, [], 0).
+countNonMatching(E, [H|T], C) :-
+    H = E,
+    countNonMatching(E, T, C).
+
+countNonMatching(E, [H|T], C) :-
+    H \= E,
+    countNonMatching(E, T, C1),
+    C is C1 + 1.
+
+:- countNonMatching(a, [a, a], X) , writeln(X).
+:- countNonMatching(a, [a, b, a, c, d], X) , writeln(X). 
