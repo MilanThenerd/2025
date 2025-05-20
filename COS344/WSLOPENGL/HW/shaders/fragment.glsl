@@ -41,7 +41,7 @@ vec4 spotLight() {
     vec3 lightEffect = (diffuse + spec) * intensity * attenuation * lightColor.rgb;
 
     // Ambient lighting (applied everywhere)
-    float ambient = 0.2;
+    float ambient = 0.4;
     vec3 base = fragmentCol.rgb * ambient;
 
     return vec4(base + lightEffect * fragmentCol.rgb, fragmentCol.a);
@@ -51,7 +51,7 @@ void main()
 {
     if (!lightEnabled) 
     {
-      float ambient = 0.2f;
+      float ambient = 0.4f;
       vec3 base = fragmentCol.rgb;
       vec3 lit = base * ambient;
       fragColor = vec4(lit, fragmentCol.a);

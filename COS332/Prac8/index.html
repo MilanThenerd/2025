@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTP Auto-Upload Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FTP Auto-Upload Test</h1>
+            <p class="subtitle">COS332 - Practical 8</p>
+        </header>
+        
+        <main>
+            <section class="info-box">
+                <h2>File Auto-Upload System</h2>
+                <p>
+                    This is a demonstration of the Java FTP client program.
+                    Any changes made to this file, the CSS, or JavaScript will be automatically uploaded.
+                </p>
+                
+                <div class="status-box">
+                    <h3>Current Status</h3>
+                    <p>File last modified: <span class="timestamp">Loading...</span></p>
+                    <p class="instruction">This timestamp shows when this HTML file was last changed and uploaded.</p>
+                </div>
+            </section>
+
+            <section class="features">
+                <h2>How It Works</h2>
+                <ol>
+                    <li>Java program monitors files for changes</li>
+                    <li>When changes are detected, connects to FTP server</li>
+                    <li>Files are uploaded using raw FTP protocol commands</li>
+                    <li>Apache web server serves the updated files</li>
+                    <li>Refresh your browser to see the changes</li>
+                </ol>
+            </section>
+            
+            <section class="technical">
+                <h2>Technical Details</h2>
+                <p>
+                    The FTP protocol uses a control connection for commands and a separate data connection 
+                    for transferring files. This implementation supports both active and passive modes.
+                </p>
+                
+                <div class="feature-list">
+                    <h3>Advanced Features</h3>
+                    <ul>
+                        <li>Directory monitoring</li>
+                        <li>Multiple file type support (.html, .css, .js)</li>
+                        <li>Persistent FTP connection</li>
+                        <li>Automatic reconnection</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>COS332 - Network Programming - Practical 8</p>
+            <p class="edit-me">Text has been changed</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
