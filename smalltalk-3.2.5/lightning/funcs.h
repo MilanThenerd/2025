@@ -1,1 +1,0 @@
-../lightning/i386/funcs.h
