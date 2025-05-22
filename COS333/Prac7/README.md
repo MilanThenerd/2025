@@ -37,16 +37,15 @@ sudo apt-get install gnu-smalltalk
 ```bash
 # Install build dependencies
 sudo apt-get update
-sudo apt-get install build-essential libsigsegv-dev libgmp-dev \
-    libreadline-dev libffi-dev libzip-dev libssl-dev libgdbm-dev \
-    autoconf automake libtool pkg-config git
+sudo apt-get install -y build-essential libsigsegv-dev libffi-dev libltdl-dev libgmp-dev pkg-config zip
 
-# Clone the repository
-git clone https://git.savannah.gnu.org/git/smalltalk.git
-cd smalltalk
+# Download and extract source
+cd /tmp
+wget https://ftp.gnu.org/gnu/smalltalk/smalltalk-3.2.5.tar.gz
+tar xzf smalltalk-3.2.5.tar.gz
+cd smalltalk-3.2.5
 
 # Configure and build
-./autogen.sh
 ./configure
 make
 sudo make install
