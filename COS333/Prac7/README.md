@@ -25,9 +25,34 @@ This practical implements a simple family expense management system in both Ruby
 ### Installing GNU Smalltalk
 
 #### On Ubuntu/Debian:
+There are two ways to install GNU Smalltalk:
+
+1. Using package manager (for Ubuntu 22.04 and earlier):
 ```bash
 sudo apt-get update
 sudo apt-get install gnu-smalltalk
+```
+
+2. Building from source (for Ubuntu 24.04 and newer):
+```bash
+# Install build dependencies
+sudo apt-get update
+sudo apt-get install build-essential libsigsegv-dev libgmp-dev \
+    libreadline-dev libffi-dev libzip-dev libssl-dev libgdbm-dev \
+    autoconf automake libtool pkg-config git
+
+# Clone the repository
+git clone https://git.savannah.gnu.org/git/smalltalk.git
+cd smalltalk
+
+# Configure and build
+./autogen.sh
+./configure
+make
+sudo make install
+
+# Update shared library cache
+sudo ldconfig
 ```
 
 #### On Fedora:
