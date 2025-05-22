@@ -1,0 +1,1137 @@
+This is gst.info, produced by makeinfo version 4.13 from
+/home/ich/source/smalltalk/release/smalltalk/doc/gst-fixed.texi.
+
+INFO-DIR-SECTION Software development
+START-INFO-DIR-ENTRY
+* Smalltalk: (gst).             The GNU Smalltalk user's guide.
+END-INFO-DIR-ENTRY
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.2 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included
+     in the section entitled "GNU Free Documentation License".
+
+
+File: gst.info,  Node: Creating exceptions,  Next: Raising exceptions,  Up: Exception handling
+
+6.11.1 Creating exceptions
+--------------------------
+
+GNU Smalltalk provides a few exceptions, all of which are subclasses of
+`Exception'.  Most of the ones you might want to create yourself are in
+the `SystemExceptions' namespace.  You can browse the builtin
+exceptions in the base library reference, and look at their names with
+`Exception printHierarchy'.
+
+   Some useful examples from the system exceptions are
+`SystemExceptions.InvalidValue', whose meaning should be obvious, and
+`SystemExceptions.WrongMessageSent', which we will demonstrate below.
+
+   Let's say that you change one of your classes to no longer support
+#new for creating new instances.  However, because you use the
+first-class classes feature of Smalltalk, it is not so easy to find and
+change all sends.  Now, you can do something like this:
+
+     Object subclass: Toaster [
+         Toaster class >> new [
+             ^SystemExceptions.WrongMessageSent
+                 signalOn: #new useInstead: #toast:
+         ]
+
+         Toaster class >> toast: reason [
+             ^super new reason: reason; yourself
+         ]
+
+         ...
+     ]
+
+   Admittedly, this doesn't quite fit the conditions for using
+exceptions.  However, since the exception type is already provided, it
+is probably easier to use it than #error: when you are doing defensive
+programming of this sort.
+
+
+File: gst.info,  Node: Raising exceptions,  Next: Handling exceptions,  Prev: Creating exceptions,  Up: Exception handling
+
+6.11.2 Raising exceptions
+-------------------------
+
+Raising an exception is really a two-step process.  First, you create
+the exception object; then, you send it `#signal'.
+
+   If you look through the hierarchy, you'll see many class methods
+that combine these steps for convenience.  For example, the class
+`Exception' provides `#new' and `#signal', where the latter is just
+`^self new signal'.
+
+   You may be tempted to provide only a signalling variant of your own
+exception creation methods.  However, this creates the problem that
+your subclasses will not be able to trivially provide new instance
+creation methods.
+
+     Error subclass: ReadOnlyText [
+         ReadOnlyText class >> signalOn: aText range: anInterval [
+             ^self new initText: aText range: anInterval; signal
+         ]
+
+         initText: aText range: anInterval [
+             <category: 'private'>
+             ...
+         ]
+     ]
+
+   Here, if you ever want to subclass `ReadOnlyText' and add new
+information to the instance before signalling it, you'll have to use
+the private method `#initText:range:'.
+
+   We recommend leaving out the signalling instance-creation variant in
+new code, as it saves very little work and makes signalling code less
+clear.  Use your own judgement and evaluation of the situation to
+determine when to include a signalling variant.
+
+
+File: gst.info,  Node: Handling exceptions,  Next: When an exception isn't handled,  Prev: Raising exceptions,  Up: Exception handling
+
+6.11.3 Handling exceptions
+--------------------------
+
+To handle an exception when it occurs in a particular block of code,
+use `#on:do:' like this:
+
+     ^[someText add: inputChar beforeIndex: i]
+         on: ReadOnlyText
+         do: [:sig | sig return: nil]
+
+   This code will put a handler for `ReadOnlyText' signals on the
+handler stack while the first block is executing.  If such an exception
+occurs, and it is not handled by any handlers closer to the point of
+signalling on the stack (known as "inner handlers"), the exception
+object will pass itself to the handler block given as the `do:'
+argument.
+
+   You will almost always want to use this object to handle the
+exception somehow.  There are six basic handler actions, all sent as
+messages to the exception object:
+
+`return:'
+     Exit the block that received this `#on:do:', returning the given
+     value.  You can also leave out the argument by sending `#return',
+     in which case it will be nil.  If you want this handler to also
+     handle exceptions in whatever value you might provide, you should
+     use `#retryUsing:' with a block instead.
+
+`retry'
+     Acts sort of like a "goto" by restarting the first block.
+     Obviously, this can lead to an infinite loop if you don't fix the
+     situation that caused the exception.
+
+     `#retry' is a good way to implement reinvocation upon recovery,
+     because it does not increase the stack height.  For example, this:
+
+            frobnicate: n [
+              ^[do some stuff with n]
+                  on: SomeError
+                  do: [:sig | sig return: (self frobnicate: n + 1)]
+              ]
+
+     should be replaced with retry:
+
+            frobnicate: aNumber [
+              | n |
+              n := aNumber.
+              ^[do some stuff with n]
+                  on: SomeError
+                  do: [:sig | n := 1 + n. sig retry]
+            ]
+
+`retryUsing:'
+     Like `#retry', except that it effectively replaces the original
+     block with the one given as an argument.
+
+`pass'
+     If you want to tell the exception to let an outer handler handle
+     it, use `#pass' instead of `#signal'.  This is just like rethrowing
+     a caught exception in other languages.
+
+`resume:'
+     This is the really interesting one.  Instead of unwinding the
+     stack, this will effectively answer the argument from the
+     `#signal' send.  Code that sends `#signal' to resumable exceptions
+     can use this value, or ignore it, and continue executing.  You can
+     also leave out the argument, in which case the `#signal' send will
+     answer nil.  Exceptions that want to be resumable must register
+     this capability by answering `true' from the `#isResumable'
+     method, which is checked on every `#resume:' send.
+
+`outer'
+     This is like `#pass', but if an outer handler uses `#resume:',
+     this handler block will be resumed  (and `#outer' will answer the
+     argument given to `#resume:') rather than the piece of code that
+     sent `#signal' in the first place.
+
+   None of these methods return to the invoking handler block except for
+`#outer', and that only in certain cases described for it above.
+
+   Exceptions provide several more features; see the methods on the
+classes `Signal' and `Exception' for the various things you can do with
+them.  Fortunately, the above methods can do what you want in almost
+all cases.
+
+   If you don't use one of these methods or another exception feature
+to exit your handler, Smalltalk will assume that you meant to `sig
+return:' whatever you answer from your handler block.  We don't
+recommend relying on this; you should use an explicit `sig return:'
+instead.
+
+   A quick shortcut to handling multiple exception types is the
+`ExceptionSet', which allows you to have a single handler for the
+exceptions of a union of classes:
+
+     ^[do some stuff with n]
+         on: SomeError, ReadOnlyError
+         do: [:sig | ...]
+
+   In this code, any `SomeError' or `ReadOnlyError' signals will be
+handled by the given handler block.
+
+
+File: gst.info,  Node: When an exception isn't handled,  Next: Creating new exception classes,  Prev: Handling exceptions,  Up: Exception handling
+
+6.11.4 When an exception isn't handled
+--------------------------------------
+
+Every exception chooses one of the above handler actions by default when
+no handler is found, or they all use `#pass'.  This is invoked by
+sending `#defaultAction' to the class.
+
+   One example of a default action is presented above as part of the
+example of `#error:' usage; that default action prints a message,
+backtrace, and unwinds the stack all the way.
+
+   The easiest way to choose a default action for your own exception
+classes is to subclass from an exception class that already chose the
+right one, as explained in the next section.  For example, some
+exceptions, such as warnings, resume by default, and thus should be
+treated as if they will almost always resume.
+
+   Selecting by superclass is by no means a requirement.  Specializing
+your `Error' subclass to be resumable, or even to resume by default, is
+perfectly acceptable when it makes sense for your design.
+
+
+File: gst.info,  Node: Creating new exception classes,  Next: Hooking into the stack unwinding,  Prev: When an exception isn't handled,  Up: Exception handling
+
+6.11.5 Creating new exception classes
+-------------------------------------
+
+If you want code to be able to handle your signalled exceptions, you
+will probably want to provide a way to pick those kinds out
+automatically.  The easiest way to do this is to subclass `Exception'.
+
+   First, you should choose an exception class to specialize.  `Error'
+is the best choice for non-resumable exceptions, and `Notification' or
+its subclass `Warning' is best for exceptions that should resume with
+`nil' by default.
+
+   Exceptions are just normal objects; include whatever information you
+think would be useful to handlers.  Note that there are two textual
+description fields, a "description" and a "message text".  The
+description, if provided, should be a more-or-less constant string
+answered from a override method on `#description', meant to describe
+all instances of your exception class.  The message text is meant to be
+provided at the point of signalling, and should be used for any extra
+information that code might want to provide.  Your signalling code can
+provide the `messageText' by using `#signal:' instead of `#signal'.
+This is yet another reason why signalling variants of instance creation
+messages can be more trouble than they're worth.
+
+
+File: gst.info,  Node: Hooking into the stack unwinding,  Next: Handler stack unwinding caveat,  Prev: Creating new exception classes,  Up: Exception handling
+
+6.11.6 Hooking into the stack unwinding
+---------------------------------------
+
+More often useful than even `#on:do:' is `#ensure:', which guarantees
+that some code is executed when the stack unwinds, whether because of
+normal execution or because of a signalled exception.
+
+   Here is an example of use of `#ensure:' and a situation where the
+stack can unwind even without a signal:
+
+     Object subclass: ExecuteWithBreak [
+       | breakBlock |
+
+       break: anObject [
+         breakBlock value: anObject
+       ]
+
+       valueWithBreak: aBlock [
+         "Sets up breakBlock before entering the block,
+          and passes self to the block."
+         | oldBreakBlock |
+         oldBreakBlock := breakBlock.
+         ^[breakBlock := [:arg | ^arg].
+           aBlock value]
+             ensure: [breakBlock := oldBreakBlock]
+       ]
+     ]
+
+   This class provides a way to stop the execution of a block without
+exiting the whole method as using `^' inside a block would do.  The use
+of `#ensure:' guarantees (hence the name "ensure") that even if
+`breakBlock' is invoked or an error is handled by unwinding, the old
+"break block" will be restored.
+
+   The definition of `breakBlock' is extremely simply; it is an example
+of the general unwinding feature of blocks, that you have probably
+already used:
+
+            (history includesKey: num)
+                ifTrue: [ ^self error: 'Duplicate check number' ].
+
+   You have probably been using `#ensure:' without knowing.  For
+example, `File>>#withReadStreamDo:' uses it to ensure that the file is
+closed when leaving the block.
+
+
+File: gst.info,  Node: Handler stack unwinding caveat,  Prev: Hooking into the stack unwinding,  Up: Exception handling
+
+6.11.7 Handler stack unwinding caveat
+-------------------------------------
+
+One important difference between Smalltalk and other languages is that
+when a handler is invoked, the stack is not unwound.  The Smalltalk
+exception system is designed this way because it's rare to write code
+that could break because of this difference, and the `#resume:' feature
+doesn't make sense if the stack is unwound.  It is easy enough to
+unwind a stack later, and is not so easy to wind it again if done too
+early.
+
+   For almost all applications, this will not matter, but it technically
+changes the semantics significantly so should be kept in mind.  One
+important case in which it might matter is when using `#ensure:' blocks
+_and_ exception handlers.  For comparison, this Smalltalk code:
+
+     | n |
+     n := 42.
+     [[self error: 'error'] ensure: [n := 24]]
+         on: Error
+         do: [:sig | n printNl. sig return].
+     n printNl.
+
+will put "42" followed by "24" on the transcript, because the `n := 24'
+will not be executed until `sig return' is invoked, unwinding the
+stack.  Similar Java code acts differently:
+
+     int n = 42;
+     try
+       {
+         try {throw new Exception ("42");}
+         finally {n = 24;}
+       }
+     catch (Exception e)
+       {
+         System.out.println (n);
+       }
+     System.out.println (n);
+
+printing "24" twice, because the stack unwinds before executing the
+catch block.
+
+
+File: gst.info,  Node: Behind the scenes,  Next: And now,  Prev: Exception handling,  Up: Tutorial
+
+6.12 Some nice stuff from the Smalltalk innards
+===============================================
+
+Just like with everything else, you'd probably end up asking yourself:
+how's it done?  So here's this chapter, just to wheten your appetite...
+
+* Menu:
+
+* Inside Arrays::                    Delving into something old
+* Two flavors of equality::          Delving into something new
+* Why is #new there?!?::	     Or, the truth on metaclasses
+* Performance::			     Hmm...  they told me Smalltalk is slow...
+
+
+File: gst.info,  Node: Inside Arrays,  Next: Two flavors of equality,  Up: Behind the scenes
+
+6.12.1 How Arrays Work
+----------------------
+
+Smalltalk provides a very adequate selection of predefined classes from
+which to choose.  Eventually, however, you will find the need to code a
+new basic data structure.  Because Smalltalk's most fundamental storage
+allocation facilities are arrays, it is important that you understand
+how to use them to gain efficient access to this kind of storage.
+
+   The Array Class. Our examples have already shown the Array class, and
+its use is fairly obvious.  For many applications, it will fill all
+your needs--when you need an array in a new class, you keep an instance
+variable, allocate a new Array and assign it to the variable, and then
+send array accesses via the instance variable.
+
+   This technique even works for string-like objects, although it is
+wasteful of storage.  An Array object uses a Smalltalk pointer for each
+slot in the array; its exact size is transparent to the programmer, but
+you can generally guess that it'll be roughly the word size of your
+machine.  (1) For storing an array of characters, therefore, an Array
+works but is inefficient.
+
+   Arrays at a Lower Level. So let's step down to a lower level of data
+structure.  A ByteArray is much like an Array, but each slot holds only
+an integer from 0 to 255-and each slot uses only a byte of storage.  If
+you only needed to store small quantities in each array slot, this
+would therefore be a much more efficient choice than an Array.  As you
+might guess, this is the type of array which a String uses.
+
+   Aha!  But when you go back to chapter 9 and look at the Smalltalk
+hierarchy, you notice that String does not inherit from ByteArray.  To
+see why, we must delve down yet another level, and arrive at the basic
+methods for setting up the structure of the instances of a class.
+
+   When we implemented our NiledArray example, we used `<shape:
+#inherit>'.  The shape is exactly that: the fundamental structure of
+Smalltalk objects created within a given class.  Let's consider the
+differences in the next sub-sections.
+
+Nothing
+     The default shape specifies the simplest Smalltalk object.  The
+     object consists only of the storage needed to hold the instance
+     variables.  In C, this would be a simple structure with zero or
+     more scalar fields.(2).
+
+`#pointer'
+     Storage is still allocated for any instance variables, but the
+     objects of the class must be created with a `new:' message.  The
+     number passed as an argument to `new:' causes the new object, in
+     addition to the space for instance variables, to also have that
+     many slots of unnamed (indexed) storage allocated.  The analog in
+     C would be to have a dynamically allocated structure with some
+     scalar fields, followed at its end by a array of pointers.
+
+`#byte'
+     The storage allocated as specified by new: is an array of bytes.
+     The analog in C would be a dynamically allocated structure with
+     scalar fields(3), followed by a array of `char'.
+
+`#word'
+     The storage allocated as specified by new: is an array of C
+     unsigned longs, which are represented in Smalltalk by Integer
+     objects.  The analog in C would be a dynamically allocated
+     structure with scalar fields, followed by an array of `long'.
+     This kind of subclass is only used in a few places in Smalltalk.
+
+`#character'
+     The storage allocated as specified by new: is an array of
+     characters.  The analog in C would be a dynamically allocated
+     structure with scalar fields, followed by a array of `char'.
+
+   There are many more shapes for more specialized usage.  All of them
+specify the same kind of "array-like" behavior, with different data
+types.
+
+   How to access this new arrays?  You already know how to access
+instance variables--by name.  But there doesn't seem to be a name for
+this new storage.  The way an object accesses it is to send itself
+array-type messages like `at:', `at:put:', and so forth.
+
+   The problem is when an object wants to add a new level of
+interpretation to these messages.  Consider a Dictionary--it is a
+pointer-holding object but its `at:' message is in terms of a key, not
+an integer index of its storage.  Since it has redefined the `at:'
+message, how does it access its fundamental storage?
+
+   The answer is that Smalltalk has defined `basicAt:' and
+`basicAt:put:', which will access the basic storage even when the `at:'
+and `at:put:' messages have been defined to provide a different
+abstraction.
+
+   This can get pretty confusing in the abstract, so let's do an
+example to show how it's pretty simple in practice.  Smalltalk arrays
+tend to start at 1; let's define an array type whose permissible range
+is arbitrary.
+
+        ArrayedCollection subclass: RangedArray [
+            | offset |
+            <comment: 'I am an Array whose base is arbitrary'>
+            RangedArray class >> new: size [
+                <category: 'instance creation'>
+                ^self new: size base: 1
+            ]
+            RangedArray class >> new: size base: b [
+                <category: 'instance creation'>
+                ^(super new: size) init: b
+            ]
+
+            init: b [
+                <category: 'init'>
+                offset := (b - 1).   "- 1 because basicAt: works with a 1 base"
+                ^self
+           ]
+           rangeCheck: i [
+                <category: 'basic'>
+                (i <= offset) | (i > (offset + self basicSize)) ifTrue: [
+                    'Bad index value: ' printOn: stderr.
+                    i printOn: stderr.
+                    Character nl printOn: stderr.
+                    ^self error: 'illegal index'
+                ]
+            ]
+            at: [
+                self rangeCheck: i.
+                ^self basicAt: i - offset
+            ]
+            at: i put: v [
+                self rangeCheck: i.
+                ^self basicAt: i - offset put: v
+            ]
+        ]
+
+   The code has two parts; an initialization, which simply records what
+index you wish the array to start with, and the at: messages, which
+adjust the requested index so that the underlying storage receives its
+1-based index instead.  We've included a range check; its utility will
+demonstrate itself in a moment:
+        a := RangedArray new: 10 base: 5.
+        a at: 5 put: 0
+        a at: 4 put: 1
+
+   Since 4 is below our base of 5, a range check error occurs.  But
+this check can catch more than just our own misbehavior!
+
+        a do: [:x| x printNl]
+
+   Our do: message handling is broken!  The stack backtrace pretty much
+tells the story:
+
+        RangedArray>>#rangeCheck:
+        RangedArray>>#at:
+        RangedArray>>#do:
+
+   Our code received a do: message.  We didn't define one, so we
+inherited the existing do: handling.  We see that an Integer loop was
+constructed, that a code block was invoked, and that our own at: code
+was invoked.  When we range checked, we trapped an illegal index.  Just
+by coincidence, this version of our range checking code also dumps the
+index.  We see that do: has assumed that all arrays start at 1.
+
+   The immediate fix is obvious; we implement our own do:
+
+        RangedArray extend [
+            do: aBlock [
+                <category: 'basic'>
+                1 to: (self basicSize) do: [:x|
+                    aBlock value: (self basicAt: x)
+                ]
+            ]
+        ]
+
+   But the issues start to run deep.  If our parent class believed that
+it knew enough to assume a starting index of 1(4), why didn't it also
+assume that it could call basicAt:?  The answer is that of the two
+choices, the designer of the parent class chose the one which was less
+likely to cause trouble; in fact all standard Smalltalk collections do
+have indices starting at 1, yet not all of them are implemented so that
+calling basicAt: would work.(5)
+
+   Object-oriented methodology says that one object should be entirely
+opaque to another.  But what sort of privacy should there be between a
+higher class and its subclasses?  How many assumption can a subclass
+make about its superclass, and how many can the superclass make before
+it begins infringing on the sovereignty of its subclasses?
+
+   Alas, there are rarely easy answers, and this is just an example.
+For this particular problem, there is an easy solution.  When the
+storage need not be accessed with peak efficiency, you can use the
+existing array classes.  When every access counts, having the storage
+be an integral part of your own object allows for the quickest
+access--but remember that when you move into this area, inheritance and
+polymorphism become trickier, as each level must coordinate its use of
+the underlying array with other levels.
+
+   ---------- Footnotes ----------
+
+   (1) For GNU Smalltalk, the size of a C `long', which is usually 32
+bits.
+
+   (2) C requires one or more; zero is allowed in Smalltalk
+
+   (3) This is not always true for other Smalltalk implementations, who
+don't allow instance variables in variableByteSubclasses and
+variableWordSubclasses.
+
+   (4) Actually, in GNU Smalltalk `do:' is not the only message
+assuming that.
+
+   (5) Some of these classes actually redefine `do:' for performance
+reasons, but they would work even if the parent class' implementation
+of `do:' was kept.
+
+
+File: gst.info,  Node: Two flavors of equality,  Next: Why is #new there?!?,  Prev: Inside Arrays,  Up: Behind the scenes
+
+6.12.2 Two flavors of equality
+------------------------------
+
+As first seen in chapter two, Smalltalk keys its dictionary with things
+like #word, whereas we generally use 'word'.  The former, as it turns
+out, is from class Symbol.  The latter is from class String.  What's
+the real difference between a Symbol and a String?  To answer the
+question, we'll use an analogy from C.
+
+   In C, if you have a function for comparing strings, you might try to
+write it:
+        streq(char *p, char *q)
+        {
+            return (p == q);
+        }
+
+   But clearly this is wrong!  The reason is that you can have two
+copies of a string, each with the same contents but each at its own
+address.  A correct string compare must walk its way through the
+strings and compare each element.
+
+   In Smalltalk, exactly the same issue exists, although the details of
+manipulating storage addresses are hidden.  If we have two Smalltalk
+strings, both with the same contents, we don't necessarily know if
+they're at the same storage address.  In Smalltalk terms, we don't know
+if they're the same object.
+
+   The Smalltalk dictionary is searched frequently.  To speed the
+search, it would be nice to not have to compare the characters of each
+element, but only compare the address itself.  To do this, you need to
+have a guarantee that all strings with the same contents are the same
+object.  The String class, created like:
+        y := 'Hello'
+   does not satisfy this.  Each time you execute this line, you may
+well get a new object.  But a very similar class, Symbol, will always
+return the same object:
+        y := #Hello
+
+   In general, you can use strings for almost all your tasks.  If you
+ever get into a performance-critical function which looks up strings,
+you can switch to Symbol.  It takes longer to create a Symbol, and the
+memory for a Symbol is never freed (since the class has to keep tabs on
+it indefinitely to guarantee it continues to return the same object).
+You can use it, but use it with care.
+
+   This tutorial has generally used the strcmp()-ish kind of checks for
+equality.  If you ever need to ask the question "is this the same
+object?", you use the `==' operator instead of `=':
+        x := y := 'Hello'
+        (x = y) printNl
+        (x == y) printNl
+        y := 'Hel', 'lo'
+        (x = y) printNl
+        (x == y) printNl
+        x := #Hello
+        y := #Hello
+        (x = y) printNl
+        (x == y) printNl
+
+   Using C terms, `=' compares contents like `strcmp()'.  `==' compares
+storage addresses, like a pointer comparison.
+
+
+File: gst.info,  Node: Why is #new there?!?,  Next: Performance,  Prev: Two flavors of equality,  Up: Behind the scenes
+
+6.12.3 The truth about metaclasses
+----------------------------------
+
+Everybody, sooner or later, looks for the implementation of the `#new'
+method in Object class.  To their surprise, they don't find it; if
+they're really smart, they search for implementors of #new in the image
+and they find out it is implemented by `Behavior'... which turns out to
+be a subclass of Object!  The truth starts showing to their eyes about
+that sentence that everybody says but few people understand: "classes
+are objects".
+
+   Huh? Classes are objects?!? Let me explain.
+
+   Open up an image; then type the text following the `st>' prompt.
+
+         st> Set superclass!
+         HashedCollection
+
+         st> HashedCollection superclass!
+         Collection
+
+         st> Collection superclass!
+         Object
+
+         st> Object superclass!
+         nil
+
+   Nothing new for now.  Let's try something else:
+
+         st> #(1 2 3) class!
+         Array
+
+         st> '123' class!
+         String
+
+         st> Set class!
+         Set class
+
+         st> Set class class!
+         Metaclass
+
+   You get it, that strange `Set class' thing is something called "a
+meta-class"... let's go on:
+
+         st> ^Set class superclass!
+         Collection class
+
+         st> ^Collection class superclass!
+         Object class
+
+   You see, there is a sort of `parallel' hierarchy between classes and
+metaclasses.  When you create a class, Smalltalk creates a metaclass;
+and just like a class describes how methods for its instances work, a
+metaclass describes how class methods for that same class work.
+
+   `Set' is an instance of the metaclass, so when you invoke the `#new'
+class method, you can also say you are invoking an instance method
+implemented by `Set class'.  Simply put, class methods are a lie:
+they're simply instance methods that are understood by instances of
+metaclasses.
+
+   Now you would expect that `Object class superclass' answers `nil
+class', that is `UndefinedObject'.  Yet you saw that `#new' is not
+implemented there... let's try it:
+
+         st> ^Object class superclass!
+         Class
+
+   Uh?!? Try to read it aloud: the `Object class' class inherits from
+the `Class' class.  `Class' is the abstract superclass of all
+metaclasses, and provides the logic that allows you to create classes
+in the image.  But it is not the termination point:
+
+         st> ^Class superclass!
+         ClassDescription
+
+         st> ^ClassDescription superclass!
+         Behavior
+
+         st> ^Behavior superclass!
+         Object
+
+   Class is a subclass of other classes.  `ClassDescription' is
+abstract; `Behavior' is concrete but lacks the methods and state that
+allow classes to have named instance variables, class comments and
+more.  Its instances are called _light-weight_ classes because they
+don't have separate metaclasses, instead they all share `Behavior'
+itself as their metaclass.
+
+   Evaluating `Behavior superclass' we have worked our way up to class
+Object again:  Object is the superclass of all instances as well as all
+metaclasses.  This complicated system is extremely powerful, and allows
+you to do very interesting things that you probably did without
+thinking about it--for example, using methods such as `#error:' or
+`#shouldNotImplement' in class methods.
+
+   Now, one final question and one final step: what are metaclasses
+instances of?  The question makes sense: if everything has a class,
+should not metaclasses have one?
+
+   Evaluate the following:
+
+         st> meta := Set class
+         st> 0 to: 4 do: [ :i |
+         st>     i timesRepeat: [ Transcript space ]
+         st>     meta printNl
+         st>     meta := meta class
+         st> ]
+         Set class
+          Metaclass
+           Metaclass class
+            Metaclass
+             Metaclass class
+         0
+
+   If you send `#class' repeatedly, it seems that you end up in a loop
+made of class `Metaclass'(1) and its own metaclass, `Metaclass class'.
+It looks like class Metaclass is an instance of an instance of itself.
+
+   To understand the role of `Metaclass', it can be useful to know that
+the class creation is implemented there.  Think about it.
+
+   * `Random class' implements creation and initialization of its
+     instances' random number seed; analogously, `Metaclass class'
+     implements creation and initialization of its instances, which are
+     metaclasses.
+
+   * And `Metaclass' implements creation and initialization of its
+     instances, which are classes (subclasses of `Class').
+
+   The circle is closed.  In the end, this mechanism implements a
+clean, elegant and (with some contemplation) understandable facility
+for self-definition of classes.  In other words, it is what allows
+classes to talk about themselves, posing the foundation for the
+creation of browsers.
+
+   ---------- Footnotes ----------
+
+   (1) Which turns out to be another subclass of `ClassDescription'.
+
+
+File: gst.info,  Node: Performance,  Prev: Why is #new there?!?,  Up: Behind the scenes
+
+6.12.4 The truth of Smalltalk performance
+-----------------------------------------
+
+Everybody says Smalltalk is slow, yet this is not completely true for
+at least three reasons.  First, most of the time in graphical
+applications is spent waiting for the user to "do something", and most
+of the time in scripting applications (which GNU Smalltalk is
+particularly well versed in) is spent in disk I/O; implementing a
+travelling salesman problem in Smalltalk would indeed be slow, but for
+most real applications you can indeed exchange performance for
+Smalltalk's power and development speed.
+
+   Second, Smalltalk's automatic memory management is faster than C's
+manual one.  Most C programs are sped up if you relink them with one of
+the garbage collecting systems available for C or C++.
+
+   Third, even though very few Smalltalk virtual machines are as
+optimized as, say, the Self environment (which reaches half the speed
+of optimized C!), they do perform some optimizations on Smalltalk code
+which make them run many times faster than a naive bytecode
+interpreter.  Peter Deutsch, who among other things invented the idea
+of a just-in-time compiler like those you are used to seeing for
+Java(1), once observed that implementing a language like Smalltalk
+efficiently requires the implementor to cheat...  but that's okay as
+long as you don't get caught.  That is, as long as you don't break the
+language semantics.  Let's look at some of these optimizations.
+
+   For certain frequently used 'special selectors', the compiler emits a
+send-special-selector bytecode instead of a send-message bytecode.
+Special selectors have one of three behaviors:
+
+   * A few selectors are assigned to special bytecode solely in order to
+     save space.  This is the case for `#do:' for example.
+
+   * Three selectors (`#at:', `#at:put:', `#size') are assigned to
+     special bytecodes because they are subject to a special caching
+     optimization.  These selectors often result in calling a virtual
+     machine primitive, so GNU Smalltalk remembers which primitve was
+     last called as the result of sending them.  If we send `#at:' 100
+     times for the same class, the last 99 sends are directly mapped to
+     the primitive, skipping the method lookup phase.
+
+   * For some pairs of receiver classes and special selectors, the
+     interpreter never looks up the method in the class; instead it
+     swiftly executes the same code which is tied to a particular
+     primitive.  Of course a special selector whose receiver or
+     argument is not of the right class to make a no-lookup pair is
+     looked up normally.
+
+   No-lookup methods do contain a primitive number specification,
+`<primitive: xx>', but it is used only when the method is reached
+through a `#perform:...' message send.  Since the method is not
+normally looked up, deleting the primitive name specification cannot in
+general prevent this primitive from running.  No-lookup pairs are
+listed below:
+
+`Integer'/`Integer'       for     `+ - * =  ~=  >  <  >=  <='
+`Float'/`Integer'                 
+`Float'/`Float'                   
+`Integer'/`Integer'       for     `//  \\     bitOr:  bitShift:  bitAnd:'
+Any pair of objects       for     `==  isNil  notNil  class'
+BlockClosure              for     `value value: blockCopy:'(2)
+
+   Other messages are open coded by the compiler.  That is, there are
+no message sends for these messages--if the compiler sees blocks
+without temporaries and with the correct number of arguments at the
+right places, the compiler unwinds them using jump bytecodes, producing
+very efficient code.  These are:
+
+       to:by:do: if the second argument is an integer literal
+       to:do:
+       timesRepeat:
+       and:, or:
+       ifTrue:ifFalse:, ifFalse:ifTrue:, ifTrue:, ifFalse:
+       whileTrue:, whileFalse:
+
+   Other minor optimizations are done.  Some are done by a peephole
+optimizer which is ran on the compiled bytecodes.  Or, for example,
+when GNU Smalltalk pushes a boolean value on the stack, it
+automatically checks whether the following bytecode is a jump (which is
+a common pattern resulting from most of the open-coded messages above)
+and combines the execution of the two bytecodes.  All these snippets
+can be optimized this way:
+
+       1 to: 5 do: [ :i | ... ]
+       a < b and: [ ... ]
+       myObject isNil ifTrue: [ ... ]
+
+   That's all.  If you want to know more, look at the virtual machine's
+source code in `libgst/interp-bc.inl' and at the compiler in
+`libgst/comp.c'.
+
+   ---------- Footnotes ----------
+
+   (1) And like the one that GNU Smalltalk includes as an experimental
+feature.
+
+   (2) You won't ever send this message in Smalltalk programs.  The
+compiler uses it when compiling blocks.
+
+
+File: gst.info,  Node: And now,  Next: The syntax,  Prev: Behind the scenes,  Up: Tutorial
+
+6.13 Some final words
+=====================
+
+The question is always how far to go in one document.  At this point,
+you know how to create classes.  You know how to use inheritance,
+polymorphism, and the basic storage management mechanisms of Smalltalk.
+You've also seen a sampling of Smalltalk's powerful classes.  The rest
+of this chapter simply points out areas for further study; perhaps a
+newer version of this document might cover these in further chapters.
+
+Viewing the Smalltalk Source Code
+     Lots of experience can be gained by looking at the source code for
+     system methods; all of them are visible: data structure classes,
+     the innards of the magic that makes classes be themselves objects
+     and have a class, a compiler written in Smalltalk itself, the
+     classes that implement the Smalltalk GUI and those that wrap
+     sockets.
+
+Other Ways to Collect Objects
+     We've seen Array, ByteArray, Dictionary, Set, and the various
+     streams.  You'll want to look at the Bag, OrderedCollection, and
+     SortedCollection classes.  For special purposes, you'll want to
+     examine the CObject and CType hierarchies.
+
+Flow of Control
+     GNU Smalltalk has support for non-preemptive multiple threads of
+     execution.  The state is embodied in a Process class object;
+     you'll also want to look at the Semaphore and ProcessorScheduler
+     class.
+
+Smalltalk Virtual Machine
+     GNU Smalltalk is implemented as a virtual instruction set.  By
+     invoking GNU Smalltalk with the `-D' option, you can view the byte
+     opcodes which are generated as files on the command line are
+     loaded.  Similarly, running GNU Smalltalk with `-E' will trace the
+     execution of instructions in your methods.
+
+     You can look at the GNU Smalltalk source to gain more information
+     on the instruction set.  With a few modifications, it is based on
+     the set described in the canonical book from two of the original
+     designers of Smalltalk: Smalltalk-80: The Language and its
+     Implementation, by Adele Goldberg and David Robson.
+
+Where to get Help
+     The Usenet comp.lang.smalltalk newsgroup is read by many people
+     with a great deal of Smalltalk experience.  There are several
+     commercial Smalltalk implementations; you can buy support for
+     these, though it isn't cheap.  For the GNU Smalltalk system in
+     particular, you can try the mailing list at:
+             help-smalltalk@gnu.org
+
+     No guarantees, but the subscribers will surely do their best!
+
+
+File: gst.info,  Node: The syntax,  Prev: And now,  Up: Tutorial
+
+6.14 A Simple Overview of Smalltalk Syntax
+==========================================
+
+Smalltalk's power comes from its treatment of objects.  In this
+document, we've mostly avoided the issue of syntax by using strictly
+parenthesized expressions as needed.  When this leads to code which is
+hard to read due to the density of parentheses, a knowledge of
+Smalltalk's syntax can let you simplify expressions.  In general, if it
+was hard for you to tell how an expression would parse, it will be hard
+for the next person, too.
+
+   The following presentation presents the grammar a couple of related
+elements at a time.  We use an EBNF style of grammar.  The form:
+        [ ...  ]
+
+means that "..." can occur zero or one times.
+
+        [ ...  ]*
+
+means zero or more;
+
+        [ ...  ]+
+
+means one or more.
+
+        ...  | ...  [ | ...  ]*
+
+means that one of the variants must be chosen.  Characters in double
+quotes refer to the literal characters.  Most elements may be separated
+by white space; where this is not legal, the elements are presented
+without white space between them.
+
+methods: "!" id ["class"] "methodsFor:" string "!" [method "!"]+ "!"
+     Methods are introduced by first naming a class (the id element),
+     specifying "class" if you're adding class methods instead of
+     instance methods, and sending a string argument to the
+     `methodsFor:' message.  Each method is terminated with an "!"; two
+     bangs in a row (with a space in the middle) signify the end of the
+     new methods.
+
+method: message [pragma] [temps] exprs
+message: id | binsel id | [keysel id]+
+pragma: "<" keymsg ">"
+temps: "|" [id]* "|"
+     A method definition starts out with a kind of template.  The
+     message to be handled is specified with the message names spelled
+     out and identifiers in the place of arguments.  A special kind of
+     definition is the pragma; it has not been covered in this tutorial
+     and it provides a way to mark a method specially as well as the
+     interface to the underlying Smalltalk virtual machine.  temps is
+     the declaration of local variables.  Finally, exprs (covered soon)
+     is the actual code for implementing the method.
+
+unit: id | literal | block | arrayconstructor | "(" expr ")"
+unaryexpr: unit [ id ]+
+primary: unit | unaryexpr
+     These are the "building blocks" of Smalltalk expressions.  A unit
+     represents a single Smalltalk value, with the highest syntactic
+     precedence.  A unaryexpr is simply a unit which receives a number
+     of unary messages.  A unaryexpr has the next highest precedence.
+     A primary is simply a convenient left-hand-side name for one of
+     the above.
+
+exprs: [expr "."]* [["^"] expr]
+expr: [id ":="]* expr2
+expr2: primary | msgexpr [ ";" cascade ]*
+     A sequence of expressions is separated by dots and can end with a
+     returned value (`^').  There can be leading assignments; unlike C,
+     assignments apply only to simple variable names.  An expression is
+     either a primary (with highest precedence) or a more complex
+     message.  cascade does not apply to primary constructions, as they
+     are too simple to require the construct.  Since all primary
+     construct are unary, you can just add more unary messages:
+             1234 printNl printNl printNl
+
+msgexpr: unaryexpr | binexpr | keyexpr
+     A complex message is either a unary message (which we have already
+     covered), a binary message (`+', `-', and so forth), or a keyword
+     message (`at:', `new:', ...) Unary has the highest precedence,
+     followed by binary, and keyword messages have the lowest
+     precedence.  Examine the two versions of the following messages.
+     The second have had parentheses added to show the default
+     precedence.
+             myvar at: 2 + 3 put: 4
+             mybool ifTrue: [ ^ 2 / 4 roundup ]
+
+             (myvar at: (2 + 3) put: (4))
+             (mybool ifTrue: ([ ^ (2 / (4 roundup)) ]))
+
+cascade: id | binmsg | keymsg
+     A cascade is used to direct further messages to the same object
+     which was last used.  The three types of messages ( id is how you
+     send a unary message) can thus be sent.
+
+binexpr: primary binmsg [ binmsg ]*
+binmsg: binsel primary
+binsel: binchar[binchar]
+     A binary message is sent to an object, which primary has
+     identified.  Each binary message is a binary selector, constructed
+     from one or two characters, and an argument which is also provided
+     by a primary.
+             1 + 2 - 3 / 4
+
+     which parses as:
+             (((1 + 2) - 3) / 4)
+
+keyexpr: keyexpr2 keymsg
+keyexpr2: binexpr | primary
+keymsg: [keysel keyw2]+
+keysel: id":"
+     Keyword expressions are much like binary expressions, except that
+     the selectors are made up of identifiers with a colon appended.
+     Where the arguments to a binary function can only be from primary,
+     the arguments to a keyword can be binary expressions or primary
+     ones.  This is because keywords have the lowest precedence.
+
+block: "[" [[":" id]* "|" ] [temps] exprs "]"
+     A code block is square brackets around a collection of Smalltalk
+     expressions.  The leading ": id" part is for block arguments.
+     Note that it is possible for a block to have temporary variables
+     of its own.
+
+arrayconstructor: "{" exprs "}"
+     Not covered in this tutorial, this syntax allows to create arrays
+     whose values are not literals, but are instead evaluated at
+     run-time.  Compare `#(a b)', which results in an Array of two
+     symbols `#a' and `#b', to `{a. b+c}' which results in an Array
+     whose two elements are the contents of variable `a' and the result
+     of summing `c' to `b'.
+
+literal: number | string | charconst | symconst | arrayconst | binding | eval
+arrayconst: "#" array | "#" bytearray
+bytearray: "[" [number]* "]"
+array: "(" [literal | array | bytearray | arraysym | ]* ")"
+number: [[dig]+ "r"] ["-"] [alphanum]+ ["." [alphanum]+] [exp ["-"][dig]+].
+string: "'"[char]*"'"
+charconst: "$"char
+symconst: "#"symbol | "#"string
+arraysym: [id | ":"]*
+exp: "d" | "e" | "q" | "s"
+     We have already shown the use of many of these constants.
+     Although not covered in this tutorial, numbers can have a base
+     specified at their front, and a trailing scientific notation.  We
+     have seen examples of character, string, and symbol constants.
+     Array constants are simple enough; they would look like:
+             a := #(1 2 'Hi' $x #Hello 4 16r3F)
+
+     There are also ByteArray constants, whose elements are constrained
+     to be integers between 0 and 255; they would look like:
+             a := #[1 2 34 16r8F 26r3H 253]
+
+     Finally, there are three types of floating-point constants with
+     varying precision (the one with the `e' being the less precise,
+     followed by `d' and `q'), and scaled-decimal constants for a
+     special class which does exact computations but truncates
+     comparisons to a given number of decimals.  For example, `1.23s4'
+     means "the value `1.23', with four significant decimal digits".
+
+binding: "#{" [id "."]* id "}"
+     This syntax has not been used in the tutorial, and results in an
+     Association literal (known as a "variable binding") tied to the
+     class that is named between braces.  For example, `#{Class} value'
+     is the same as `Class'.  The dot syntax is required for supporting
+     namespaces: `#{Smalltalk.Class}' is the same as `Smalltalk
+     associationAt: #Class', but is resolved at compile-time rather
+     than at run-time.
+
+symbol: id | binsel | keysel[keysel]*
+     Symbols are mostly used to represent the names of methods.  Thus,
+     they can hold simple identifiers, binary selectors, and keyword
+     selectors:
+             #hello
+             #+
+             #at:put:
+
+eval: "##(" [temps] exprs ")"
+     This syntax also has not been used in the tutorial, and results in
+     evaluating an arbitrarily complex expression at compile-time, and
+     substituting the result: for example `##(Object allInstances
+     size)' is the number of instances of `Object' held in the image
+     _at the time the method is compiled_.
+
+id: letter[alphanum]*
+binchar: "+" | "-" | "*" | "/" | "~" | "|" | "," |
+"<" | ">" | "=" | "&" | "@" | "?" | "\" | "%"
+alphanum: dig | letter
+letter: "A".."Z"
+dig: "0".."9"
+     These are the categories of characters and how they are combined
+     at the most basic level.  binchar simply lists the characters
+     which can be combined to name a binary message.
+
+
+

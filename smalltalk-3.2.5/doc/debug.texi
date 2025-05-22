@@ -1,0 +1,244 @@
+@c Define the class index, method index, and selector cross-reference
+@ifclear CLASS-INDICES
+@set CLASS-INDICES
+@defindex cl
+@defcodeindex me
+@defcodeindex sl 
+@end ifclear
+
+@c These are used for both TeX and HTML
+@set BEFORE1
+@set  AFTER1
+@set BEFORE2
+@set  AFTER2
+
+@ifinfo
+@c Use asis so that leading and trailing spaces are meaningful.
+@c Remember we're inside a @menu command, hence the blanks are
+@c kept in the output.
+@set BEFORE1 @asis{* }
+@set  AFTER1 @asis{::}
+@set BEFORE2 @asis{  (}
+@set  AFTER2 @asis{)}
+@end ifinfo
+
+@macro class {a,b}
+@value{BEFORE1}\a\\a\@b{\b\}@value{AFTER1}
+@end macro
+@macro superclass {a,b}
+\a\\a\@value{BEFORE2}@i{\b\}@value{AFTER2}
+@end macro
+
+@ifnotinfo
+@macro begindetailmenu
+@display
+@end macro
+@macro enddetailmenu
+@end display
+@end macro
+@end ifnotinfo
+
+@ifinfo
+@macro begindetailmenu
+@detailmenu
+@end macro
+@macro enddetailmenu
+@end detailmenu
+@end macro
+@end ifinfo
+
+@iftex
+@macro beginmenu
+@end macro
+@macro endmenu
+@end macro
+@end iftex
+
+@ifnottex
+@macro beginmenu
+@menu
+@end macro
+@macro endmenu
+@end menu
+@end macro
+@end ifnottex
+
+@beginmenu
+@ifnottex
+Alphabetic list:
+* Debugger::
+@end ifnottex
+
+@ifinfo
+Class tree:
+@end ifinfo
+@iftex
+@section Tree
+@end iftex
+@ifnotinfo
+
+Classes documented in this manual are @b{boldfaced}.
+
+@end ifnotinfo
+@begindetailmenu
+@superclass{@t{}, Object}
+@class{@t{ }, Debugger}
+@enddetailmenu
+@endmenu
+@unmacro class
+@unmacro superclass
+@unmacro endmenu
+@unmacro beginmenu
+@unmacro enddetailmenu
+@unmacro begindetailmenu
+@node Debugger
+@section Debugger
+@clindex Debugger
+
+@table @b
+@item Defined in namespace Smalltalk
+@itemx Superclass: Object
+@itemx Category: System-Debugging
+I provide debugging facilities for another inferior process.  I have
+methods that allow the controlled process to proceed with varying
+granularity.  In addition, I keep a cache mapping instruction
+pointer bytecodes to line numbers.
+@end table
+
+@menu
+* Debugger class-disabling debugging::  (class)
+* Debugger class-instance creation::  (class)
+* Debugger class-source code::  (class)
+* Debugger-inferior process properties::  (instance)
+* Debugger-stepping commands::  (instance)
+@end menu
+
+
+
+@node Debugger class-disabling debugging
+@subsection Debugger class:@- disabling debugging
+
+@table @b
+@meindex debuggerClass
+@item debuggerClass
+Answer `nil'.
+
+@end table
+
+
+
+@node Debugger class-instance creation
+@subsection Debugger class:@- instance creation
+
+@table @b
+@meindex on:@-
+@item on:@- aProcess
+Suspend aProcess and return a new Debugger that controls aProcess.
+aProcess must not be the currently running process.
+
+
+@end table
+
+
+
+@node Debugger class-source code
+@subsection Debugger class:@- source code
+
+@table @b
+@meindex currentLineIn:@-
+@item currentLineIn:@- aContext
+Not commented.
+
+@end table
+
+
+
+@node Debugger-inferior process properties
+@subsection Debugger:@- inferior process properties
+
+@table @b
+@meindex currentLine
+@item currentLine
+Return the line number in traced process.
+
+
+@meindex isActive
+@item isActive
+Answer true if the inferior process is still running.
+
+
+@meindex process
+@item process
+Answer the inferior process.
+
+
+@meindex suspendedContext
+@item suspendedContext
+Answer the suspended execution state of the inferior process.
+
+
+@end table
+
+
+
+@node Debugger-stepping commands
+@subsection Debugger:@- stepping commands
+
+@table @b
+@meindex continue
+@item continue
+Terminate the controlling process and continue execution of the
+traced process.
+
+
+@meindex finish
+@item finish
+Run to the next return.
+
+
+@meindex finish:@-
+@item finish:@- aContext
+Run up until aContext returns.
+
+
+@meindex next
+@item next
+Run to the end of the current line in the inferior process, skipping
+over message sends.
+
+
+@meindex slowFinish
+@item slowFinish
+Run in single-step mode up to the next return.
+
+
+@meindex slowFinish:@-
+@item slowFinish:@- aContext
+Run in single-step mode until aContext returns.
+
+
+@meindex step
+@item step
+Run to the end of the current line in the inferior process or to the
+next message send.
+
+
+@meindex stepBytecode
+@item stepBytecode
+Run a single bytecode in the inferior process.
+
+
+@meindex stopInferior
+@item stopInferior
+Suspend the inferior process and raise a DebuggerReentered notification
+in the controlling process.
+
+
+@meindex stopInferior:@-
+@item stopInferior:@- anObject
+Suspend the inferior process and raise a DebuggerReentered notification
+in the controlling process with anObject as the exception's message.
+
+
+@end table
+

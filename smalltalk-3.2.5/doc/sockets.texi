@@ -1,0 +1,3664 @@
+@c Define the class index, method index, and selector cross-reference
+@ifclear CLASS-INDICES
+@set CLASS-INDICES
+@defindex cl
+@defcodeindex me
+@defcodeindex sl 
+@end ifclear
+
+@c These are used for both TeX and HTML
+@set BEFORE1
+@set  AFTER1
+@set BEFORE2
+@set  AFTER2
+
+@ifinfo
+@c Use asis so that leading and trailing spaces are meaningful.
+@c Remember we're inside a @menu command, hence the blanks are
+@c kept in the output.
+@set BEFORE1 @asis{* }
+@set  AFTER1 @asis{::}
+@set BEFORE2 @asis{  (}
+@set  AFTER2 @asis{)}
+@end ifinfo
+
+@macro class {a,b}
+@value{BEFORE1}\a\\a\@b{\b\}@value{AFTER1}
+@end macro
+@macro superclass {a,b}
+\a\\a\@value{BEFORE2}@i{\b\}@value{AFTER2}
+@end macro
+
+@ifnotinfo
+@macro begindetailmenu
+@display
+@end macro
+@macro enddetailmenu
+@end display
+@end macro
+@end ifnotinfo
+
+@ifinfo
+@macro begindetailmenu
+@detailmenu
+@end macro
+@macro enddetailmenu
+@end detailmenu
+@end macro
+@end ifinfo
+
+@iftex
+@macro beginmenu
+@end macro
+@macro endmenu
+@end macro
+@end iftex
+
+@ifnottex
+@macro beginmenu
+@menu
+@end macro
+@macro endmenu
+@end menu
+@end macro
+@end ifnottex
+
+@beginmenu
+@ifnottex
+Alphabetic list:
+* Sockets.AbstractSocket::
+* Sockets.AbstractSocketImpl::
+* Sockets.CAddrInfoStruct::
+* Sockets.CSockAddrIn6Struct::
+* Sockets.Datagram::
+* Sockets.DatagramSocket::
+* Sockets.DatagramSocketImpl::
+* Sockets.DummyStream::
+* Sockets.ICMP6SocketImpl::
+* Sockets.ICMPSocketImpl::
+* Sockets.IP6Address::
+* Sockets.IPAddress::
+* Sockets.MulticastSocket::
+* Sockets.MulticastSocketImpl::
+* Sockets.OOBSocketImpl::
+* Sockets.RawSocketImpl::
+* Sockets.ReadBuffer::
+* Sockets.ServerSocket::
+* Sockets.Socket::
+* Sockets.SocketAddress::
+* Sockets.SocketImpl::
+* Sockets.StreamSocket::
+* Sockets.TCPSocketImpl::
+* Sockets.UDPSocketImpl::
+* Sockets.UnixAddress::
+* Sockets.UnixDatagramSocketImpl::
+* Sockets.UnixSocketImpl::
+* Sockets.WriteBuffer::
+@end ifnottex
+
+@ifinfo
+Class tree:
+@end ifinfo
+@iftex
+@section Tree
+@end iftex
+@ifnotinfo
+
+Classes documented in this manual are @b{boldfaced}.
+
+@end ifnotinfo
+@begindetailmenu
+@superclass{@t{}, Object}
+@superclass{@t{ }, CObject}
+@superclass{@t{  }, CCompound}
+@superclass{@t{   }, CStruct}
+@class{@t{    }, Sockets.CAddrInfoStruct}
+@class{@t{    }, Sockets.CSockAddrIn6Struct}
+@superclass{@t{ }, Iterable}
+@superclass{@t{  }, Stream}
+@superclass{@t{   }, FileDescriptor}
+@class{@t{    }, Sockets.AbstractSocketImpl}
+@class{@t{     }, Sockets.DatagramSocketImpl}
+@class{@t{      }, Sockets.MulticastSocketImpl}
+@class{@t{       }, Sockets.UDPSocketImpl}
+@class{@t{      }, Sockets.OOBSocketImpl}
+@class{@t{      }, Sockets.RawSocketImpl}
+@class{@t{       }, Sockets.ICMP6SocketImpl}
+@class{@t{       }, Sockets.ICMPSocketImpl}
+@class{@t{      }, Sockets.UnixDatagramSocketImpl}
+@class{@t{     }, Sockets.SocketImpl}
+@class{@t{      }, Sockets.TCPSocketImpl}
+@class{@t{      }, Sockets.UnixSocketImpl}
+@superclass{@t{   }, PositionableStream}
+@superclass{@t{    }, ReadStream}
+@class{@t{     }, Sockets.ReadBuffer}
+@superclass{@t{    }, WriteStream}
+@class{@t{     }, Sockets.WriteBuffer}
+@class{@t{   }, Sockets.AbstractSocket}
+@class{@t{    }, Sockets.DatagramSocket}
+@class{@t{     }, Sockets.MulticastSocket}
+@class{@t{    }, Sockets.ServerSocket}
+@class{@t{    }, Sockets.StreamSocket}
+@class{@t{     }, Sockets.Socket}
+@class{@t{   }, Sockets.DummyStream}
+@class{@t{ }, Sockets.Datagram}
+@class{@t{ }, Sockets.SocketAddress}
+@class{@t{  }, Sockets.IP6Address}
+@class{@t{  }, Sockets.IPAddress}
+@class{@t{  }, Sockets.UnixAddress}
+@enddetailmenu
+@endmenu
+@unmacro class
+@unmacro superclass
+@unmacro endmenu
+@unmacro beginmenu
+@unmacro enddetailmenu
+@unmacro begindetailmenu
+@node Sockets.AbstractSocket
+@section Sockets.AbstractSocket
+@clindex Sockets.AbstractSocket
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Stream
+@itemx Category: Sockets-Streams
+
+This class models a client site socket.  A socket is a TCP/IP endpoint
+for network communications conceptually similar to a file handle.
+
+This class only takes care of buffering and blocking if requested.
+It uses an underlying socket implementation object which is
+a subclass of AbstractSocketImpl.  This is necessary to hide
+some methods in FileDescriptor that are not relevant to sockets,
+as well as to implement buffering independently of the implementation
+nuances required by the different address families.  The address
+family class (a subclass of SocketAddress) acts as a factory for socket
+implementation objects.
+@end table
+
+@menu
+* Sockets.AbstractSocket class-defaults::  (class)
+* Sockets.AbstractSocket class-instance creation::  (class)
+* Sockets.AbstractSocket class-timed-out operations::  (class)
+* Sockets.AbstractSocket class-well known ports::  (class)
+* Sockets.AbstractSocket-accessing::  (instance)
+* Sockets.AbstractSocket-printing::  (instance)
+* Sockets.AbstractSocket-socket options::  (instance)
+* Sockets.AbstractSocket-stream protocol::  (instance)
+* Sockets.AbstractSocket-testing::  (instance)
+@end menu
+
+
+
+@node Sockets.AbstractSocket class-defaults
+@subsection Sockets.AbstractSocket class:@- defaults
+
+@table @b
+@meindex defaultAddressClass
+@item defaultAddressClass
+Answer the default address family to be used.  In the library,
+the address family is represented by a subclass of SocketAddress
+which is by default IPAddress.
+
+
+@meindex defaultAddressClass:@-
+@item defaultAddressClass:@- class
+Set the default address family to be used.  In the library,
+the address family is represented by a subclass of SocketAddress
+which is by default IPAddress.
+
+
+@meindex defaultImplementationClassFor:@-
+@item defaultImplementationClassFor:@- aSocketAddressClass
+Answer the default implementation class.  Depending on the
+subclass, this might be the default stream socket implementation
+class of the given address class, or rather its default datagram
+socket implementation class.
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocket class-instance creation
+@subsection Sockets.AbstractSocket class:@- instance creation
+
+@table @b
+@meindex new
+@item new
+This method should not be called for instances of this class.
+
+@meindex new:@-
+@item new:@- implementation
+Answer a new instance of the receiver, using as the underlying
+layer the object passed as the `implementation' parameter; the
+object is probably going to be some kind of AbstractSocketImpl.
+
+
+@meindex new:@-addressClass:@-
+@item new:@- implClass addressClass:@- addressClass
+Answer a new instance of the receiver, using as the underlying
+layer a new instance of `implementationClass' and using the
+protocol family of `addressClass'.
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocket class-timed-out operations
+@subsection Sockets.AbstractSocket class:@- timed-out operations
+
+@table @b
+@meindex checkPeriod
+@item checkPeriod
+Answer the period that is to elapse between socket polls if data
+data is not ready and the connection is still open (in milliseconds)
+
+
+@meindex checkPeriod:@-
+@item checkPeriod:@- anInteger
+Set the period that is to elapse between socket polls if data
+data is not ready and the connection is still open (in milliseconds)
+
+
+@meindex timeout
+@item timeout
+Answer the period that is to elapse between the request for (yet
+unavailable) data and the moment when the connection is considered dead
+(in milliseconds)
+
+
+@meindex timeout:@-
+@item timeout:@- anInteger
+Set the period that is to elapse between the request for (yet
+unavailable) data and the moment when the connection is considered
+dead (in milliseconds)
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocket class-well known ports
+@subsection Sockets.AbstractSocket class:@- well known ports
+
+@table @b
+@meindex defaultPortAt:@-
+@item defaultPortAt:@- protocol
+Answer the port that is used (by default) for the given service (high
+level protocol)
+
+
+@meindex defaultPortAt:@-ifAbsent:@-
+@item defaultPortAt:@- protocol ifAbsent:@- port
+Answer the port that is used (by default) for the given service (high
+level protocol), or the specified port if none is registered.
+
+
+@meindex defaultPortAt:@-put:@-
+@item defaultPortAt:@- protocol put:@- port
+Associate the given port to the service specified by `protocol'.
+
+
+@meindex portCmdServer
+@item portCmdServer
+Answer the port on which the rsh daemon listens
+
+
+@meindex portDNS
+@item portDNS
+Answer the port on which the DNS listens
+
+
+@meindex portDayTime
+@item portDayTime
+Answer the port on which the TOD service listens
+
+
+@meindex portDiscard
+@item portDiscard
+Answer the port on which the DISCARD service listens
+
+
+@meindex portEcho
+@item portEcho
+Answer the port on which the ECHO service listens
+
+
+@meindex portExecServer
+@item portExecServer
+Answer the port on which the exec server listens
+
+
+@meindex portFTP
+@item portFTP
+Answer the port on which the FTP daemon listens
+
+
+@meindex portFinger
+@item portFinger
+Answer the port on which the finger daemon listens
+
+
+@meindex portGopher
+@item portGopher
+Answer the port on which the Gopher daemon listens
+
+
+@meindex portHTTP
+@item portHTTP
+Answer the port on which the http daemon listens
+
+
+@meindex portLoginServer
+@item portLoginServer
+Answer the port on which the rlogin daemon listens
+
+
+@meindex portNNTP
+@item portNNTP
+Answer the port on which the nntp daemon listens
+
+
+@meindex portNetStat
+@item portNetStat
+Answer the port on which the NETSTAT service listens
+
+
+@meindex portPOP3
+@item portPOP3
+Answer the port on which the pop3 daemon listens
+
+
+@meindex portReserved
+@item portReserved
+Answer the last port reserved to privileged processes
+
+
+@meindex portSMTP
+@item portSMTP
+Answer the port on which the SMTP daemon listens
+
+
+@meindex portSSH
+@item portSSH
+Answer the port on which the SSH daemon listens
+
+
+@meindex portSystat
+@item portSystat
+Answer the port on which the SYSTAT service listens
+
+
+@meindex portTelnet
+@item portTelnet
+Answer the port on which the TELNET daemon listens
+
+
+@meindex portTimeServer
+@item portTimeServer
+Answer the port on which the time server listens
+
+
+@meindex portWhois
+@item portWhois
+Answer the port on which the WHOIS daemon listens
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocket-accessing
+@subsection Sockets.AbstractSocket:@- accessing
+
+@table @b
+@meindex address
+@item address
+Answer an IP address that is of common interest (this can be either
+the local or the remote address, according to the definition in the
+subclass).
+
+
+@meindex available
+@slindex canRead
+@item available
+Answer whether there is data available on the socket.  Same as
+#canRead, present for backwards compatibility.
+
+
+@meindex canRead
+@item canRead
+Answer whether there is data available on the socket.
+
+
+@meindex canWrite
+@item canWrite
+Answer whether there is free space in the socket's write buffer.
+
+
+@meindex close
+@item close
+Close the socket represented by the receiver.
+
+
+@meindex flush
+@item flush
+Flush any buffers used by the receiver.
+
+
+@meindex isOpen
+@item isOpen
+Answer whether the connection between the receiver and the remote
+endpoint is still alive.
+
+
+@meindex isPeerAlive
+@item isPeerAlive
+Answer whether the connection with the peer remote machine is still
+valid.
+
+
+@meindex localAddress
+@item localAddress
+Answer the local IP address of the socket.
+
+
+@meindex localPort
+@item localPort
+Answer the local IP port of the socket.
+
+
+@meindex port
+@item port
+Answer an IP port that is of common interest (this can be the port for
+either the local or remote endpoint, according to the definitions in the
+subclass
+
+
+@meindex remoteAddress
+@item remoteAddress
+Answer the IP address of the socket's remote endpoint.
+
+
+@meindex remotePort
+@item remotePort
+Answer the IP port of the socket's remote endpoint.
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocket-printing
+@subsection Sockets.AbstractSocket:@- printing
+
+@table @b
+@meindex printOn:@-
+@item printOn:@- aStream
+Print a representation of the receiver on aStream
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocket-socket options
+@subsection Sockets.AbstractSocket:@- socket options
+
+@table @b
+@meindex soLinger
+@item soLinger
+Answer the number of seconds that the socket is allowed to wait
+if it promises reliable delivery but has unacknowledged/untransmitted
+packets when it is closed, or nil if those packets are left to their
+destiny or discarded.
+
+
+@meindex soLinger:@-
+@item soLinger:@- linger
+Set the number of seconds that the socket is allowed to wait
+if it promises reliable delivery but has unacknowledged/untransmitted
+packets when it is closed.
+
+
+@meindex soLingerOff
+@item soLingerOff
+Specify that, even if the socket promises reliable delivery, any
+packets that are unacknowledged/untransmitted when it is closed
+are to be left to their destiny or discarded.
+
+
+@meindex species
+@item species
+Answer `String'.
+
+@end table
+
+
+
+@node Sockets.AbstractSocket-stream protocol
+@subsection Sockets.AbstractSocket:@- stream protocol
+
+@table @b
+@meindex atEnd
+@item atEnd
+By default, answer whether the connection is still open.
+
+
+@meindex next
+@item next
+Read another character from the socket, failing if the connection is
+dead.
+
+
+@meindex next:@-putAll:@-startingAt:@-
+@item next:@- n putAll:@- aCollection startingAt:@- pos
+Write `char' to the socket, failing if the connection is dead.  The
+SIGPIPE signal is automatically caught and ignored by the system.
+
+
+@meindex nextPut:@-
+@item nextPut:@- char
+Write `char' to the socket, failing if the connection is dead.  The
+SIGPIPE signal is automatically caught and ignored by the system.
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocket-testing
+@subsection Sockets.AbstractSocket:@- testing
+
+@table @b
+@meindex isExternalStream
+@item isExternalStream
+Answer whether the receiver streams on a file or socket.
+
+
+@end table
+
+@node Sockets.AbstractSocketImpl
+@section Sockets.AbstractSocketImpl
+@clindex Sockets.AbstractSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: FileDescriptor
+@itemx Category: Sockets-Protocols
+
+This abstract class serves as the parent class for socket implementations.
+The implementation class serves an intermediary to routines that
+perform the actual socket operations.  It hides the buffering and
+blocking behavior of the Socket classes.
+
+A default implementation is provided by each address family, but
+this can be changed by class methods on SocketAddress sublcasses.
+@end table
+
+@menu
+* Sockets.AbstractSocketImpl class-abstract::  (class)
+* Sockets.AbstractSocketImpl class-C call-outs::  (class)
+* Sockets.AbstractSocketImpl class-C constants::  (class)
+* Sockets.AbstractSocketImpl class-socket creation::  (class)
+* Sockets.AbstractSocketImpl-accessing::  (instance)
+* Sockets.AbstractSocketImpl-asynchronous operations::  (instance)
+* Sockets.AbstractSocketImpl-C call-outs::  (instance)
+* Sockets.AbstractSocketImpl-C constants::  (instance)
+* Sockets.AbstractSocketImpl-socket operations::  (instance)
+* Sockets.AbstractSocketImpl-socket options::  (instance)
+@end menu
+
+
+
+@node Sockets.AbstractSocketImpl class-abstract
+@subsection Sockets.AbstractSocketImpl class:@- abstract
+
+@table @b
+@meindex addressClass
+@item addressClass
+Answer the class responsible for handling addresses for
+the receiver
+
+
+@meindex protocol
+@item protocol
+Answer the protocol parameter for `create'
+
+
+@meindex socketType
+@item socketType
+Answer the socket type parameter for `create'.
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocketImpl class-C call-outs
+@subsection Sockets.AbstractSocketImpl class:@- C call-outs
+
+@table @b
+@meindex accept:@-peer:@-addrLen:@-
+@item accept:@- socket peer:@- peer addrLen:@- len
+Not commented.
+
+@meindex bind:@-to:@-addrLen:@-
+@item bind:@- socket to:@- addr addrLen:@- len
+Not commented.
+
+@meindex connect:@-to:@-addrLen:@-
+@item connect:@- socket to:@- addr addrLen:@- len
+Not commented.
+
+@meindex create:@-type:@-protocol:@-
+@item create:@- family type:@- type protocol:@- protocol
+Not commented.
+
+@meindex getPeerName:@-addr:@-addrLen:@-
+@item getPeerName:@- socket addr:@- addr addrLen:@- len
+Not commented.
+
+@meindex getSockName:@-addr:@-addrLen:@-
+@item getSockName:@- socket addr:@- addr addrLen:@- len
+Not commented.
+
+@meindex listen:@-log:@-
+@item listen:@- socket log:@- len
+Not commented.
+
+@meindex option:@-level:@-at:@-get:@-size:@-
+@item option:@- socket level:@- level at:@- name get:@- value size:@- len
+Not commented.
+
+@meindex option:@-level:@-at:@-put:@-size:@-
+@item option:@- socket level:@- level at:@- name put:@- value size:@- len
+Not commented.
+
+@meindex receive:@-buffer:@-size:@-flags:@-from:@-size:@-
+@item receive:@- socket buffer:@- buf size:@- len flags:@- flags from:@- addr size:@- addrLen
+Not commented.
+
+@meindex send:@-buffer:@-size:@-flags:@-to:@-size:@-
+@item send:@- socket buffer:@- buf size:@- len flags:@- flags to:@- addr size:@- addrLen
+Not commented.
+
+@end table
+
+
+
+@node Sockets.AbstractSocketImpl class-C constants
+@subsection Sockets.AbstractSocketImpl class:@- C constants
+
+@table @b
+@meindex soLinger
+@item soLinger
+Not commented.
+
+@meindex soReuseAddr
+@item soReuseAddr
+Not commented.
+
+@meindex sockDgram
+@item sockDgram
+Not commented.
+
+@meindex sockRDM
+@item sockRDM
+Not commented.
+
+@meindex sockRaw
+@item sockRaw
+Not commented.
+
+@meindex sockStream
+@item sockStream
+Not commented.
+
+@meindex solSocket
+@item solSocket
+Not commented.
+
+@end table
+
+
+
+@node Sockets.AbstractSocketImpl class-socket creation
+@subsection Sockets.AbstractSocketImpl class:@- socket creation
+
+@table @b
+@meindex newFor:@-
+@item newFor:@- addressClass
+Create a socket for the receiver.
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocketImpl-accessing
+@subsection Sockets.AbstractSocketImpl:@- accessing
+
+@table @b
+@meindex connectTo:@-port:@-
+@item connectTo:@- ipAddress port:@- port
+Connect the receiver to the given IP address and port. `Connecting'
+means attaching the remote endpoint of the socket.
+
+
+@meindex localAddress
+@item localAddress
+Answer the address of the local endpoint of the socket (even if IP
+is not being used, this identifies the machine that is bound to the
+socket).
+
+
+@meindex localPort
+@item localPort
+Answer the port of the local endpoint of the socket (even if IP
+is not being used, this identifies the service or process that
+is bound to the socket).
+
+
+@meindex remoteAddress
+@item remoteAddress
+Answer the address of the remote endpoint of the socket (even if IP
+is not being used, this identifies the machine to which the socket
+is connected).
+
+
+@meindex remotePort
+@item remotePort
+Answer the port of the remote endpoint of the socket (even if IP
+is not being used, this identifies the service or process to which
+the socket is connected).
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocketImpl-asynchronous operations
+@subsection Sockets.AbstractSocketImpl:@- asynchronous operations
+
+@table @b
+@meindex ensureReadable
+@item ensureReadable
+If the file is open, wait until data can be read from it.  The wait
+allows other Processes to run.
+
+
+@meindex ensureWriteable
+@item ensureWriteable
+If the file is open, wait until we can write to it.  The wait
+allows other Processes to run.
+
+
+@meindex waitForException
+@item waitForException
+If the file is open, wait until an exceptional condition (such
+as presence of out of band data) has occurred on it.  The wait
+allows other Processes to run.
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocketImpl-C call-outs
+@subsection Sockets.AbstractSocketImpl:@- C call-outs
+
+@table @b
+@meindex accept:@-peer:@-addrLen:@-
+@item accept:@- socket peer:@- peer addrLen:@- len
+Not commented.
+
+@meindex bind:@-to:@-addrLen:@-
+@item bind:@- socket to:@- addr addrLen:@- len
+Not commented.
+
+@meindex connect:@-to:@-addrLen:@-
+@item connect:@- socket to:@- addr addrLen:@- len
+Not commented.
+
+@meindex create:@-type:@-protocol:@-
+@item create:@- family type:@- type protocol:@- protocol
+Not commented.
+
+@meindex getPeerName:@-addr:@-addrLen:@-
+@item getPeerName:@- socket addr:@- addr addrLen:@- len
+Not commented.
+
+@meindex getSockName:@-addr:@-addrLen:@-
+@item getSockName:@- socket addr:@- addr addrLen:@- len
+Not commented.
+
+@meindex listen:@-log:@-
+@item listen:@- socket log:@- len
+Not commented.
+
+@meindex option:@-level:@-at:@-get:@-size:@-
+@item option:@- socket level:@- level at:@- name get:@- value size:@- len
+Not commented.
+
+@meindex option:@-level:@-at:@-put:@-size:@-
+@item option:@- socket level:@- level at:@- name put:@- value size:@- len
+Not commented.
+
+@meindex receive:@-buffer:@-size:@-flags:@-from:@-size:@-
+@item receive:@- socket buffer:@- buf size:@- len flags:@- flags from:@- addr size:@- addrLen
+Not commented.
+
+@meindex send:@-buffer:@-size:@-flags:@-to:@-size:@-
+@item send:@- socket buffer:@- buf size:@- len flags:@- flags to:@- addr size:@- addrLen
+Not commented.
+
+@end table
+
+
+
+@node Sockets.AbstractSocketImpl-C constants
+@subsection Sockets.AbstractSocketImpl:@- C constants
+
+@table @b
+@meindex soError:@-
+@item soError:@- socket
+Not commented.
+
+@end table
+
+
+
+@node Sockets.AbstractSocketImpl-socket operations
+@subsection Sockets.AbstractSocketImpl:@- socket operations
+
+@table @b
+@meindex accept:@-
+@item accept:@- implementationClass
+Accept a connection on the receiver, and create a new instance
+of implementationClass that will deal with the newly created
+active server socket.
+
+
+@meindex bindTo:@-port:@-
+@item bindTo:@- ipAddress port:@- port
+Bind the receiver to the given IP address and port. `Binding' means
+attaching the local endpoint of the socket.
+
+
+@meindex fileOp:@-
+@item fileOp:@- ioFuncIndex
+Private - Used to limit the number of primitives used by FileStreams
+
+
+@meindex fileOp:@-ifFail:@-
+@item fileOp:@- ioFuncIndex ifFail:@- aBlock
+Private - Used to limit the number of primitives used by FileStreams.
+
+
+@meindex fileOp:@-with:@-
+@item fileOp:@- ioFuncIndex with:@- arg1
+Private - Used to limit the number of primitives used by FileStreams
+
+
+@meindex fileOp:@-with:@-ifFail:@-
+@item fileOp:@- ioFuncIndex with:@- arg1 ifFail:@- aBlock
+Private - Used to limit the number of primitives used by FileStreams.
+
+
+@meindex fileOp:@-with:@-with:@-
+@item fileOp:@- ioFuncIndex with:@- arg1 with:@- arg2
+Private - Used to limit the number of primitives used by FileStreams
+
+
+@meindex fileOp:@-with:@-with:@-ifFail:@-
+@item fileOp:@- ioFuncIndex with:@- arg1 with:@- arg2 ifFail:@- aBlock
+Private - Used to limit the number of primitives used by FileStreams.
+
+
+@meindex fileOp:@-with:@-with:@-with:@-
+@item fileOp:@- ioFuncIndex with:@- arg1 with:@- arg2 with:@- arg3
+Private - Used to limit the number of primitives used by FileStreams
+
+
+@meindex fileOp:@-with:@-with:@-with:@-ifFail:@-
+@item fileOp:@- ioFuncIndex with:@- arg1 with:@- arg2 with:@- arg3 ifFail:@- aBlock
+Private - Used to limit the number of primitives used by FileStreams.
+
+
+@meindex getSockName
+@item getSockName
+Retrieve a ByteArray containing a sockaddr_in struct for the
+local endpoint of the socket.
+
+
+@meindex listen:@-
+@item listen:@- backlog
+Make the receiver a passive server socket with a pending connections
+queue of the given size.
+
+
+@end table
+
+
+
+@node Sockets.AbstractSocketImpl-socket options
+@subsection Sockets.AbstractSocketImpl:@- socket options
+
+@table @b
+@meindex optionAt:@-level:@-put:@-
+@item optionAt:@- opt level:@- level put:@- anObject
+Modify the value of a socket option.  The option identifier is in
+`opt' and the level is in `level'.  anObject can be a boolean,
+integer, socket address or ByteArray. A layer over this method is
+provided for the most common socket options, so this will be rarely
+used.
+
+
+@meindex optionAt:@-level:@-size:@-
+@item optionAt:@- opt level:@- level size:@- size
+Answer in a ByteArray of the given size the value of a socket option.
+The option identifier is in `opt' and the level is in `level'.  A
+layer over this method is provided for the most common socket options,
+so this will be rarely used.
+
+
+@meindex soLinger
+@item soLinger
+Answer the number of seconds by which a `close' operation can block
+to ensure that all the packets have reliably reached the destination,
+or nil if those packets are left to their destiny.
+
+
+@meindex soLinger:@-
+@item soLinger:@- linger
+Set the number of seconds by which a `close' operation can block
+to ensure that all the packets have reliably reached the destination.
+If linger is nil, those packets are left to their destiny.
+
+
+@meindex soReuseAddr
+@item soReuseAddr
+Answer whether another socket can be bound the same local address as this
+one.  If you enable this option, you can actually have two sockets with the
+same Internet port number; but the system won't allow you to use the two
+identically-named sockets in a way that would confuse the Internet.  The
+reason for this option is that some higher-level Internet protocols,
+including FTP, require you to keep reusing the same socket number.
+
+
+@meindex soReuseAddr:@-
+@item soReuseAddr:@- aBoolean
+Set whether another socket can be bound the same local address as this one.
+
+
+@meindex valueWithoutBuffering:@-
+@item valueWithoutBuffering:@- aBlock
+Evaluate aBlock, ensuring that any data that it writes to the socket
+is sent immediately to the network.
+
+
+@end table
+
+@node Sockets.CAddrInfoStruct
+@section Sockets.CAddrInfoStruct
+@clindex Sockets.CAddrInfoStruct
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: CStruct
+@itemx Category: 
+
+@end table
+
+@menu
+* Sockets.CAddrInfoStruct class-C call-outs::  (class)
+* Sockets.CAddrInfoStruct-C call-outs::  (instance)
+* Sockets.CAddrInfoStruct-C function wrappers::  (instance)
+@end menu
+
+
+
+@node Sockets.CAddrInfoStruct class-C call-outs
+@subsection Sockets.CAddrInfoStruct class:@- C call-outs
+
+@table @b
+@meindex getaddrinfo:@-service:@-hints:@-result:@-
+@item getaddrinfo:@- name service:@- servname hints:@- hints result:@- res
+Not commented.
+
+@end table
+
+
+
+@node Sockets.CAddrInfoStruct-C call-outs
+@subsection Sockets.CAddrInfoStruct:@- C call-outs
+
+@table @b
+@meindex aiAddr
+@item aiAddr
+Not commented.
+
+@meindex aiCanonname
+@item aiCanonname
+Not commented.
+
+@meindex free
+@item free
+Not commented.
+
+@end table
+
+
+
+@node Sockets.CAddrInfoStruct-C function wrappers
+@subsection Sockets.CAddrInfoStruct:@- C function wrappers
+
+@table @b
+@meindex getaddrinfo:@-
+@item getaddrinfo:@- name
+Not commented.
+
+@meindex getaddrinfo:@-service:@-
+@item getaddrinfo:@- name service:@- service
+Not commented.
+
+@end table
+
+@node Sockets.CSockAddrIn6Struct
+@section Sockets.CSockAddrIn6Struct
+@clindex Sockets.CSockAddrIn6Struct
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: CStruct
+@itemx Category: 
+
+@end table
+
+@menu
+@end menu
+
+@node Sockets.Datagram
+@section Sockets.Datagram
+@clindex Sockets.Datagram
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Object
+@itemx Category: Sockets-Protocols
+
+This class models a packet of data that is to be sent across the network
+using a connectionless protocol such as UDP.  It contains the data
+to be send, as well as the destination address and port.  Note that
+datagram packets can arrive in any order and are not guaranteed to be
+delivered at all.
+
+This class can also be used for receiving data from the network.
+@end table
+
+@menu
+* Sockets.Datagram class-instance creation::  (class)
+* Sockets.Datagram-accessing::  (instance)
+@end menu
+
+
+
+@node Sockets.Datagram class-instance creation
+@subsection Sockets.Datagram class:@- instance creation
+
+@table @b
+@meindex data:@-
+@item data:@- aByteArray
+Answer a new datagram with the specified data.
+
+
+@meindex data:@-address:@-port:@-
+@item data:@- aByteArray address:@- ipAddress port:@- port
+Answer a new datagram with the specified target socket, and
+aByteArray as its data.
+
+
+@meindex object:@-address:@-port:@-
+@slindex object:@-objectDumper:@-address:@-port:@-
+@item object:@- object address:@- ipAddress port:@- port
+Serialize the object onto a ByteArray, and create a Datagram
+with the object as its contents, and the specified receiver.
+Note that each invocation of this method creates a separate
+ObjectDumper; if different objects that you're sending are likely
+to contain references to the same objects, you should use
+#object:@-objectDumper:@-address:@-port:@-.
+
+
+@meindex object:@-objectDumper:@-address:@-port:@-
+@item object:@- object objectDumper:@- od address:@- ipAddress port:@- port
+Serialize the object onto a ByteArray, and create a Datagram with
+the object as its contents, and the specified receiver.  Serialization
+takes place through ObjectDumper passed as `od', and the stream
+attached to the ObjectDumper is resetted every time.  Using this
+method is indicated if different objects that you're sending are
+likely to contain references to the same objects.
+
+
+@end table
+
+
+
+@node Sockets.Datagram-accessing
+@subsection Sockets.Datagram:@- accessing
+
+@table @b
+@meindex address
+@item address
+Answer the address of the target socket
+
+
+@meindex address:@-
+@item address:@- ipAddress
+Set the address of the target socket
+
+
+@meindex data
+@item data
+Answer the data attached to the datagram
+
+
+@meindex data:@-
+@item data:@- aByteArray
+Set the data attached to the datagram
+
+
+@meindex dataSize
+@item dataSize
+Answer the size of the message.
+
+
+@meindex dataSize:@-
+@item dataSize:@- aSize
+I am called to update the size...
+
+
+@meindex get
+@slindex object:@-address:@-port:@-
+@item get
+Parse the data attached to the datagram through a newly created
+ObjectDumper, and answer the resulting object.  This method is
+complementary to #object:@-address:@-port:@-.
+
+
+@meindex getThrough:@-
+@slindex object:@-objectDumper:@-address:@-port:@-
+@item getThrough:@- objectDumper
+Parse the data attached to the datagram through the given
+ObjectDumper without touching the stream to which it is
+attached, and answer the resulting object.  The state of
+the ObjectDumper, though, is updated.  This method is
+complementary to #object:@-objectDumper:@-address:@-port:@-.
+
+
+@meindex port
+@item port
+Answer the IP port of the target socket
+
+
+@meindex port:@-
+@item port:@- thePort
+Set the IP port of the target socket
+
+
+@meindex size
+@item size
+I determine the size of the datagram. It is either an explicitly
+specified dataSize, or the size of the whole collection.
+
+
+@end table
+
+@node Sockets.DatagramSocket
+@section Sockets.DatagramSocket
+@clindex Sockets.DatagramSocket
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.AbstractSocket
+@itemx Category: Sockets-Streams
+
+This class models a connectionless datagram socket that sends
+individual packets of data across the network.  In the TCP/IP world,
+this means UDP.  Datagram packets do not have guaranteed delivery,
+or any guarantee about the order the data will be received on the
+remote host.
+
+This class uses an underlying socket implementation object which is
+a subclass of DatagramSocketImpl.  This is less necessary for
+datagram sockets than for stream sockets (except for hiding some
+methods in FileDescriptor that are not relevant to sockets),
+but it is done for cleanliness and symmetry.
+@end table
+
+@menu
+* Sockets.DatagramSocket class-accessing::  (class)
+* Sockets.DatagramSocket class-initialization::  (class)
+* Sockets.DatagramSocket class-instance creation::  (class)
+* Sockets.DatagramSocket-accessing::  (instance)
+* Sockets.DatagramSocket-direct operations::  (instance)
+@end menu
+
+
+
+@node Sockets.DatagramSocket class-accessing
+@subsection Sockets.DatagramSocket class:@- accessing
+
+@table @b
+@meindex defaultBufferSize
+@item defaultBufferSize
+Answer the default maximum size for input datagrams.
+
+
+@meindex defaultBufferSize:@-
+@item defaultBufferSize:@- size
+Set the default maximum size for input datagrams.
+
+
+@meindex defaultImplementationClassFor:@-
+@item defaultImplementationClassFor:@- aSocketAddressClass
+Answer the default implementation class.  Depending on the
+subclass, this might be the default stream socket implementation
+class of the given address class, or rather its default datagram
+socket implementation class.
+
+
+@end table
+
+
+
+@node Sockets.DatagramSocket class-initialization
+@subsection Sockets.DatagramSocket class:@- initialization
+
+@table @b
+@meindex initialize
+@item initialize
+Initialize the class to use an input datagram size of 128.
+
+
+@end table
+
+
+
+@node Sockets.DatagramSocket class-instance creation
+@subsection Sockets.DatagramSocket class:@- instance creation
+
+@table @b
+@meindex local:@-port:@-
+@item local:@- ipAddressOrString port:@- remotePort
+Create a new socket and bind it to the given host (passed as a
+String to be resolved or as an IPAddress), on the given port.
+
+
+@meindex new
+@item new
+Answer a new datagram socket (by default an UDP socket), without
+a specified local address and port.
+
+
+@meindex port:@-
+@item port:@- localPort
+Create a new socket and bind it to the local host on the given port.
+
+
+@meindex remote:@-port:@-local:@-port:@-
+@item remote:@- ipAddressOrString port:@- remotePort local:@- ipAddress port:@- localPort
+Create a new socket and bind it to the given host (passed as a
+String to be resolved or as a SocketAddress), and to the given remotePort.
+The default destination for the datagrams will be ipAddressOrString
+(if not nil), on the remotePort port.
+
+
+@end table
+
+
+
+@node Sockets.DatagramSocket-accessing
+@subsection Sockets.DatagramSocket:@- accessing
+
+@table @b
+@meindex address
+@item address
+Answer the local address.
+
+
+@meindex bufferSize
+@item bufferSize
+Answer the size of the buffer in which datagrams are stored.
+
+
+@meindex bufferSize:@-
+@item bufferSize:@- size
+Set the size of the buffer in which datagrams are stored.
+
+
+@meindex datagramClass
+@item datagramClass
+Answer the class used by the socket to return datagrams.
+
+
+@meindex next
+@item next
+Read a datagram on the socket and answer it.
+
+
+@meindex nextPut:@-
+@item nextPut:@- aDatagram
+Send the given datagram on the socket.
+
+
+@meindex peek
+@item peek
+Peek for a datagram on the socket and answer it.
+
+
+@meindex peek:@-
+@item peek:@- datagram
+Peek for a datagram on the socket, store it in `datagram', and
+answer the datagram itself.
+
+
+@meindex port
+@item port
+Answer the local port.
+
+
+@meindex receive:@-
+@item receive:@- datagram
+Read a datagram from the socket, store it in `datagram', and
+answer the datagram itself.
+
+
+@end table
+
+
+
+@node Sockets.DatagramSocket-direct operations
+@subsection Sockets.DatagramSocket:@- direct operations
+
+@table @b
+@meindex nextFrom:@-port:@-
+@item nextFrom:@- ipAddress port:@- port
+Answer the next datagram from the given address and port.
+
+
+@end table
+
+@node Sockets.DatagramSocketImpl
+@section Sockets.DatagramSocketImpl
+@clindex Sockets.DatagramSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.AbstractSocketImpl
+@itemx Category: Sockets-Protocols
+
+This abstract class serves as the parent class for datagram socket
+implementations.
+@end table
+
+@menu
+* Sockets.DatagramSocketImpl class-parameters::  (class)
+* Sockets.DatagramSocketImpl-accessing::  (instance)
+* Sockets.DatagramSocketImpl-C constants::  (instance)
+* Sockets.DatagramSocketImpl-socket operations::  (instance)
+@end menu
+
+
+
+@node Sockets.DatagramSocketImpl class-parameters
+@subsection Sockets.DatagramSocketImpl class:@- parameters
+
+@table @b
+@meindex datagramClass
+@item datagramClass
+Answer the datagram class returned by default by instances of
+this class.
+
+
+@meindex socketType
+@item socketType
+Answer the socket type parameter for `create'.
+
+
+@end table
+
+
+
+@node Sockets.DatagramSocketImpl-accessing
+@subsection Sockets.DatagramSocketImpl:@- accessing
+
+@table @b
+@meindex bufferSize
+@item bufferSize
+Answer the size of the buffer in which datagrams are stored.
+
+
+@meindex bufferSize:@-
+@item bufferSize:@- size
+Set the size of the buffer in which datagrams are stored.
+
+
+@end table
+
+
+
+@node Sockets.DatagramSocketImpl-C constants
+@subsection Sockets.DatagramSocketImpl:@- C constants
+
+@table @b
+@meindex ipAddMembership
+@item ipAddMembership
+Not commented.
+
+@meindex ipDropMembership
+@item ipDropMembership
+Not commented.
+
+@meindex ipMulticastIf
+@item ipMulticastIf
+Not commented.
+
+@meindex ipMulticastTtl
+@item ipMulticastTtl
+Not commented.
+
+@meindex msgPeek
+@item msgPeek
+Not commented.
+
+@end table
+
+
+
+@node Sockets.DatagramSocketImpl-socket operations
+@subsection Sockets.DatagramSocketImpl:@- socket operations
+
+@table @b
+@meindex next
+@item next
+Retrieve a datagram from the receiver, answer a new object
+of the receiver's datagram class.
+
+
+@meindex nextPut:@-
+@item nextPut:@- aDatagram
+Send aDatagram on the socket
+
+
+@meindex peek
+@item peek
+Peek for a datagram on the receiver, answer a new object
+of the receiver's datagram class.
+
+
+@meindex peek:@-
+@item peek:@- aDatagram
+Peek for a datagram on the receiver, answer aDatagram modified
+to contain information on the newly received datagram.
+
+
+@meindex receive:@-
+@item receive:@- aDatagram
+Retrieve a datagram from the receiver, answer aDatagram modified
+to contain information on the newly received datagram.
+
+
+@meindex receive:@-datagram:@-
+@item receive:@- flags datagram:@- aDatagram
+Receive a new datagram into `datagram', with the given flags, and
+answer `datagram' itself; this is an abstract method.
+The flags can be zero to receive the datagram, or `self msgPeek'
+to only peek for it without removing it from the queue.
+
+
+@meindex send:@-to:@-port:@-
+@item send:@- aDatagram to:@- theReceiver port:@- port
+Send aDatagram on the socket to the given receiver and port
+
+
+@end table
+
+@node Sockets.DummyStream
+@section Sockets.DummyStream
+@clindex Sockets.DummyStream
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Stream
+@itemx Category: Sockets-Tests
+
+@end table
+
+@menu
+@end menu
+
+@node Sockets.ICMP6SocketImpl
+@section Sockets.ICMP6SocketImpl
+@clindex Sockets.ICMP6SocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.RawSocketImpl
+@itemx Category: Sockets-Protocols
+
+Unless the application installs its own implementation, this is the
+default socket implementation that will be used for IPv6 raw
+sockets.  It uses C call-outs to implement standard BSD style sockets
+of family AF_INET, type SOCK_RAW, protocol IPPROTO_ICMPV6.
+@end table
+
+@menu
+* Sockets.ICMP6SocketImpl class-C constants::  (class)
+@end menu
+
+
+
+@node Sockets.ICMP6SocketImpl class-C constants
+@subsection Sockets.ICMP6SocketImpl class:@- C constants
+
+@table @b
+@meindex protocol
+@item protocol
+Not commented.
+
+@end table
+
+@node Sockets.ICMPSocketImpl
+@section Sockets.ICMPSocketImpl
+@clindex Sockets.ICMPSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.RawSocketImpl
+@itemx Category: Sockets-Protocols
+
+Unless the application installs its own implementation, this is the
+default socket implementation that will be used for IPv4 raw
+sockets.  It uses C call-outs to implement standard BSD style sockets
+of family AF_INET, type SOCK_RAW, protocol IPPROTO_ICMP.
+@end table
+
+@menu
+* Sockets.ICMPSocketImpl class-C constants::  (class)
+@end menu
+
+
+
+@node Sockets.ICMPSocketImpl class-C constants
+@subsection Sockets.ICMPSocketImpl class:@- C constants
+
+@table @b
+@meindex protocol
+@item protocol
+Not commented.
+
+@end table
+
+@node Sockets.IP6Address
+@section Sockets.IP6Address
+@clindex Sockets.IP6Address
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.SocketAddress
+@itemx Category: Sockets-Protocols
+
+This class models an IPv6 address.  It also acts as a factory for IPv6
+stream (TCP), datagram (UDP) and raw sockets.
+@end table
+
+@menu
+* Sockets.IP6Address class-C constants::  (class)
+* Sockets.IP6Address class-constants::  (class)
+* Sockets.IP6Address class-initialization::  (class)
+* Sockets.IP6Address class-instance creation::  (class)
+* Sockets.IP6Address-accessing::  (instance)
+* Sockets.IP6Address-printing::  (instance)
+@end menu
+
+
+
+@node Sockets.IP6Address class-C constants
+@subsection Sockets.IP6Address class:@- C constants
+
+@table @b
+@meindex addressFamily
+@item addressFamily
+Not commented.
+
+@meindex aiAll
+@item aiAll
+Not commented.
+
+@meindex aiV4mapped
+@item aiV4mapped
+Not commented.
+
+@meindex protocolFamily
+@item protocolFamily
+Not commented.
+
+@end table
+
+
+
+@node Sockets.IP6Address class-constants
+@subsection Sockets.IP6Address class:@- constants
+
+@table @b
+@meindex addressSize
+@item addressSize
+Answer the size of an IPv4 address.
+
+
+@meindex version
+@item version
+Answer the version of IP that the receiver implements.
+
+
+@end table
+
+
+
+@node Sockets.IP6Address class-initialization
+@subsection Sockets.IP6Address class:@- initialization
+
+@table @b
+@meindex createLoopbackHost
+@item createLoopbackHost
+Answer an object representing the loopback host in the address
+family for the receiver.  This is ::@-1 for IPv4.
+
+
+@meindex createUnknownAddress
+@item createUnknownAddress
+Answer an object representing an unkown address in the address
+family for the receiver
+
+
+@meindex initialize
+@item initialize
+Set up the default implementation classes for the receiver
+
+
+@end table
+
+
+
+@node Sockets.IP6Address class-instance creation
+@subsection Sockets.IP6Address class:@- instance creation
+
+@table @b
+@meindex fromArray:@-
+@item fromArray:@- parts
+Answer a new IP6Address from an array of numbers; the numbers
+are to be thought as the colon-separated numbers in the standard
+numbers-and-colons notation for IPv4 addresses.
+
+
+@meindex fromBytes:@-
+@item fromBytes:@- aByteArray
+Answer a new IP6Address from a ByteArray containing the bytes
+in the same order as the digit form:@- 131.175.6.2 would be
+represented as #[131 175 6 2].
+
+
+@meindex fromSockAddr:@-port:@-
+@item fromSockAddr:@- aByteArray port:@- portAdaptor
+Private - Answer a new IP6Address from a ByteArray containing a
+C sockaddr_in structure.  The portAdaptor's value is changed
+to contain the port that the structure refers to.
+
+
+@meindex fromString:@-
+@item fromString:@- aString
+Answer a new IP6Address from a String containing the requested
+address in digit form.
+
+
+@meindex new
+@item new
+This method should not be called for instances of this class.
+
+@end table
+
+
+
+@node Sockets.IP6Address-accessing
+@subsection Sockets.IP6Address:@- accessing
+
+@table @b
+@meindex asByteArray
+@item asByteArray
+Answer a read-only ByteArray of size four containing the
+receiver's bytes in network order (big-endian)
+
+
+@meindex isMulticast
+@item isMulticast
+Answer whether the receiver reprensents an address reserved for
+multicast datagram connections
+
+
+@end table
+
+
+
+@node Sockets.IP6Address-printing
+@subsection Sockets.IP6Address:@- printing
+
+@table @b
+@meindex printOn:@-
+@item printOn:@- aStream
+Print the receiver in dot notation.
+
+
+@end table
+
+@node Sockets.IPAddress
+@section Sockets.IPAddress
+@clindex Sockets.IPAddress
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.SocketAddress
+@itemx Category: Sockets-Protocols
+
+This class models an IPv4 address.  It also acts as a factory for IPv4
+stream (TCP), datagram (UDP) and raw sockets.
+@end table
+
+@menu
+* Sockets.IPAddress class-C constants::  (class)
+* Sockets.IPAddress class-constants::  (class)
+* Sockets.IPAddress class-initialization::  (class)
+* Sockets.IPAddress class-instance creation::  (class)
+* Sockets.IPAddress-accessing::  (instance)
+* Sockets.IPAddress-printing::  (instance)
+@end menu
+
+
+
+@node Sockets.IPAddress class-C constants
+@subsection Sockets.IPAddress class:@- C constants
+
+@table @b
+@meindex addressFamily
+@item addressFamily
+Not commented.
+
+@meindex protocolFamily
+@item protocolFamily
+Not commented.
+
+@end table
+
+
+
+@node Sockets.IPAddress class-constants
+@subsection Sockets.IPAddress class:@- constants
+
+@table @b
+@meindex addressSize
+@item addressSize
+Answer the size of an IPv4 address.
+
+
+@meindex version
+@item version
+Answer the version of IP that the receiver implements.
+
+
+@end table
+
+
+
+@node Sockets.IPAddress class-initialization
+@subsection Sockets.IPAddress class:@- initialization
+
+@table @b
+@meindex createLoopbackHost
+@item createLoopbackHost
+Answer an object representing the loopback host in the address
+family for the receiver.  This is 127.0.0.1 for IPv4.
+
+
+@meindex createUnknownAddress
+@item createUnknownAddress
+Answer an object representing an unkown address in the address
+family for the receiver
+
+
+@meindex initialize
+@item initialize
+Set up the default implementation classes for the receiver
+
+
+@end table
+
+
+
+@node Sockets.IPAddress class-instance creation
+@subsection Sockets.IPAddress class:@- instance creation
+
+@table @b
+@meindex fromArray:@-
+@item fromArray:@- parts
+Answer a new IPAddress from an array of numbers; the numbers
+are to be thought as the dot-separated numbers in the standard
+numbers-and-dots notation for IPv4 addresses.
+
+
+@meindex fromBytes:@-
+@item fromBytes:@- aByteArray
+Answer a new IPAddress from a ByteArray containing the bytes
+in the same order as the digit form:@- 131.175.6.2 would be
+represented as #[131 175 6 2].
+
+
+@meindex fromSockAddr:@-port:@-
+@item fromSockAddr:@- aByteArray port:@- portAdaptor
+Private - Answer a new IPAddress from a ByteArray containing a
+C sockaddr_in structure.  The portAdaptor's value is changed
+to contain the port that the structure refers to.
+
+
+@meindex fromString:@-
+@slindex loopbackHost
+@item fromString:@- aString
+Answer a new IPAddress from a String containing the requested
+address in digit form.  Hexadecimal forms are not allowed.
+
+An Internet host address is a number containing four bytes of data.
+These are divided into two parts, a network number and a local
+network address number within that network. The network number
+consists of the first one, two or three bytes; the rest of the
+bytes are the local address.
+
+Network numbers are registered with the Network Information Center
+(NIC), and are divided into three classes--A, B, and C. The local
+network address numbers of individual machines are registered with
+the administrator of the particular network.
+
+Class A networks have single-byte numbers in the range 0 to 127. There
+are only a small number of Class A networks, but they can each support
+a very large number of hosts (several millions). Medium-sized Class B
+networks have two-byte network numbers, with the first byte in the range
+128 to 191; they support several thousands of host, but are almost
+exhausted. Class C networks are the smallest and the most commonly
+available; they have three-byte network numbers, with the first byte
+in the range 192-223. Class D (multicast, 224.0.0.0 to 239.255.255.255)
+and E (research, 240.0.0.0 to 255.255.255.255) also have three-byte
+network numbers.
+
+Thus, the first 1, 2, or 3 bytes of an Internet address specifies a
+network. The remaining bytes of the Internet address specify the address
+within that network.  The Class A network 0 is reserved for broadcast to
+all networks. In addition, the host number 0 within each network is
+reserved for broadcast to all hosts in that network.  The Class A network
+127 is reserved for loopback; you can always use the Internet address
+`127.0.0.1' to refer to the host machine (this is answered by the
+#loopbackHost class method).
+
+Since a single machine can be a member of multiple networks, it can have
+multiple Internet host addresses. However, there is never supposed to be
+more than one machine with the same host address.
+
+There are four forms of the standard numbers-and-dots notation for
+Internet addresses:@- a.b.c.d specifies all four bytes of the address
+individually; a.b.c interprets as a 2-byte quantity, which is useful for
+specifying host addresses in a Class B network with network address number
+a.b; a.b intrprets the last part of the address as a 3-byte quantity,
+which is useful for specifying host addresses in a Class A network with
+network address number a.
+
+If only one part is given, this corresponds directly to the host address
+number.
+
+
+@meindex new
+@item new
+This method should not be called for instances of this class.
+
+@meindex with:@-with:@-with:@-with:@-
+@item with:@- b1 with:@- b2 with:@- b3 with:@- b4
+Answer a new IPAddress whose bytes (from most-significant
+to least-significant) are in the parameters.
+
+
+@end table
+
+
+
+@node Sockets.IPAddress-accessing
+@subsection Sockets.IPAddress:@- accessing
+
+@table @b
+@meindex addressClass
+@slindex fromString:@-
+@item addressClass
+Answer the `address class' of the receiver (see
+IPAddress class>>@-#fromString:@-)
+
+
+@meindex asByteArray
+@item asByteArray
+Answer a read-only ByteArray of size four containing the
+receiver's bytes in network order (big-endian)
+
+
+@meindex host
+@item host
+Answer an host number for the receiver; this is given by
+the last three bytes for class A addresses, by the last
+two bytes for class B addresses, else by the last byte.
+
+
+@meindex isMulticast
+@item isMulticast
+Answer whether the receiver reprensents an address reserved for
+multicast datagram connections
+
+
+@meindex network
+@item network
+Answer a network number for the receiver; this is given by the
+first three bytes for class C/D/E addresses, by the first two
+bytes for class B addresses, else by the first byte.
+
+
+@meindex subnet
+@item subnet
+Answer an host number for the receiver; this is 0 for class A
+addresses, while it is given by the last byte of the network
+number for class B/C/D/E addresses.
+
+
+@end table
+
+
+
+@node Sockets.IPAddress-printing
+@subsection Sockets.IPAddress:@- printing
+
+@table @b
+@meindex printOn:@-
+@item printOn:@- aStream
+Print the receiver in dot notation.
+
+
+@end table
+
+@node Sockets.MulticastSocket
+@section Sockets.MulticastSocket
+@clindex Sockets.MulticastSocket
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.DatagramSocket
+@itemx Category: Sockets-Streams
+
+This class models a multicast socket that sends packets to a multicast
+group.  All members of the group listening on that address and port will
+receive all the messages sent to the group.
+
+In the TCP/IP world, these sockets are UDP-based and a multicast group
+consists of a multicast address (a class D internet address, i.e. one
+whose most significant bits are 1110), and a well known port number.
+@end table
+
+@menu
+* Sockets.MulticastSocket-instance creation::  (instance)
+@end menu
+
+
+
+@node Sockets.MulticastSocket-instance creation
+@subsection Sockets.MulticastSocket:@- instance creation
+
+@table @b
+@meindex interface
+@item interface
+Answer the local device supporting the multicast socket.  This
+is usually set to any local address.
+
+
+@meindex interface:@-
+@item interface:@- ipAddress
+Set the local device supporting the multicast socket.  This
+is usually set to any local address.
+
+
+@meindex join:@-
+@item join:@- ipAddress
+Join the multicast socket at the given IP address
+
+
+@meindex leave:@-
+@item leave:@- ipAddress
+Leave the multicast socket at the given IP address
+
+
+@meindex nextPut:@-timeToLive:@-
+@item nextPut:@- packet timeToLive:@- timeToLive
+Send the datagram with a specific TTL (time-to-live)
+
+
+@meindex timeToLive
+@item timeToLive
+Answer the socket's datagrams' default time-to-live
+
+
+@meindex timeToLive:@-
+@item timeToLive:@- newTTL
+Set the default time-to-live for the socket's datagrams
+
+
+@end table
+
+@node Sockets.MulticastSocketImpl
+@section Sockets.MulticastSocketImpl
+@clindex Sockets.MulticastSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.DatagramSocketImpl
+@itemx Category: Sockets-Protocols
+
+This abstract class serves as the parent class for datagram socket
+implementations that support multicast.
+@end table
+
+@menu
+* Sockets.MulticastSocketImpl-multicasting::  (instance)
+@end menu
+
+
+
+@node Sockets.MulticastSocketImpl-multicasting
+@subsection Sockets.MulticastSocketImpl:@- multicasting
+
+@table @b
+@meindex ipMulticastIf
+@item ipMulticastIf
+Answer the local device for a multicast socket (in the form of
+an address)
+
+
+@meindex ipMulticastIf:@-
+@item ipMulticastIf:@- interface
+Set the local device for a multicast socket (in the form of
+an address, usually anyLocalAddress)
+
+
+@meindex join:@-
+@item join:@- ipAddress
+Join the multicast socket at the given address
+
+
+@meindex leave:@-
+@item leave:@- ipAddress
+Leave the multicast socket at the given address
+
+
+@meindex timeToLive
+@item timeToLive
+Answer the time to live of the datagrams sent through the receiver
+to a multicast socket.
+
+
+@meindex timeToLive:@-
+@item timeToLive:@- ttl
+Set the time to live of the datagrams sent through the receiver
+to a multicast socket.
+
+
+@end table
+
+@node Sockets.OOBSocketImpl
+@section Sockets.OOBSocketImpl
+@clindex Sockets.OOBSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.DatagramSocketImpl
+@itemx Category: Sockets-Protocols
+
+This abstract class serves as the parent class for socket
+implementations that send out-of-band data over a stream socket.
+@end table
+
+@menu
+* Sockets.OOBSocketImpl-C constants::  (instance)
+* Sockets.OOBSocketImpl-implementation::  (instance)
+@end menu
+
+
+
+@node Sockets.OOBSocketImpl-C constants
+@subsection Sockets.OOBSocketImpl:@- C constants
+
+@table @b
+@meindex msgOOB
+@item msgOOB
+Not commented.
+
+@end table
+
+
+
+@node Sockets.OOBSocketImpl-implementation
+@subsection Sockets.OOBSocketImpl:@- implementation
+
+@table @b
+@meindex canRead
+@item canRead
+Answer whether out-of-band data is available on the socket
+
+
+@meindex ensureReadable
+@item ensureReadable
+Stop the process until an error occurs or out-of-band data
+becomes available on the socket
+
+
+@end table
+
+@node Sockets.RawSocketImpl
+@section Sockets.RawSocketImpl
+@clindex Sockets.RawSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.DatagramSocketImpl
+@itemx Category: Sockets-Protocols
+
+This abstract class serves as the parent class for raw socket
+implementations.  Raw socket packets are modeled as datagrams.
+@end table
+
+@menu
+* Sockets.RawSocketImpl class-parameters::  (class)
+@end menu
+
+
+
+@node Sockets.RawSocketImpl class-parameters
+@subsection Sockets.RawSocketImpl class:@- parameters
+
+@table @b
+@meindex socketType
+@item socketType
+Answer the socket type parameter for `create'.
+
+
+@end table
+
+@node Sockets.ReadBuffer
+@section Sockets.ReadBuffer
+@clindex Sockets.ReadBuffer
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: ReadStream
+@itemx Category: Examples-Useful tools
+
+I'm a ReadStream that, when the end of the stream is reached,
+evaluates an user defined block to try to get some more data.
+@end table
+
+@menu
+* Sockets.ReadBuffer class-instance creation::  (class)
+* Sockets.ReadBuffer-accessing-reading::  (instance)
+* Sockets.ReadBuffer-buffer handling::  (instance)
+@end menu
+
+
+
+@node Sockets.ReadBuffer class-instance creation
+@subsection Sockets.ReadBuffer class:@- instance creation
+
+@table @b
+@meindex on:@-
+@item on:@- aCollection
+Answer a Stream that uses aCollection as a buffer.  You
+should ensure that the fillBlock is set before the first
+operation, because the buffer will report that the data
+has ended until you set the fillBlock.
+
+
+@end table
+
+
+
+@node Sockets.ReadBuffer-accessing-reading
+@subsection Sockets.ReadBuffer:@- accessing-reading
+
+@table @b
+@meindex nextAvailable:@-into:@-startingAt:@-
+@item nextAvailable:@- anInteger into:@- aCollection startingAt:@- pos
+Place the next anInteger objects from the receiver into aCollection,
+starting at position pos.  Return the number of items stored.
+
+
+@meindex nextAvailable:@-putAllOn:@-
+@item nextAvailable:@- anInteger putAllOn:@- aStream
+Copy the next anInteger objects from the receiver to aStream.
+Return the number of items stored.
+
+
+@meindex upTo:@-
+@item upTo:@- anObject
+Returns a collection of the same type that the stream accesses, up to
+but not including the object anObject.  Returns the entire rest of the
+stream's contents if anObject is not present.
+
+
+@meindex upToEnd
+@item upToEnd
+Returns a collection of the same type that the stream accesses, up to
+but not including the object anObject.  Returns the entire rest of the
+stream's contents if anObject is not present.
+
+
+@end table
+
+
+
+@node Sockets.ReadBuffer-buffer handling
+@subsection Sockets.ReadBuffer:@- buffer handling
+
+@table @b
+@meindex atEnd
+@item atEnd
+Answer whether the data stream has ended.
+
+
+@meindex availableBytes
+@item availableBytes
+Answer how many bytes are available in the buffer.
+
+
+@meindex bufferContents
+@item bufferContents
+Answer the data that is in the buffer, and empty it.
+
+
+@meindex close
+@item close
+Not commented.
+
+@meindex fill
+@item fill
+Fill the buffer with more data if it is empty, and answer
+true if the fill block was able to read more data.
+
+
+@meindex fillBlock:@-
+@item fillBlock:@- block
+Set the block that fills the buffer. It receives a collection
+and the number of bytes to fill in it, and must return the number
+of bytes actually read
+
+
+@meindex isEmpty
+@item isEmpty
+Answer whether the next input operation will force a buffer fill
+
+
+@meindex isFull
+@item isFull
+Answer whether the buffer has been just filled
+
+
+@meindex notEmpty
+@item notEmpty
+Check whether the next input operation will force a buffer fill
+and answer true if it will not.
+
+
+@meindex pastEnd
+@item pastEnd
+Try to fill the buffer if the data stream has ended.
+
+
+@end table
+
+@node Sockets.ServerSocket
+@section Sockets.ServerSocket
+@clindex Sockets.ServerSocket
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.AbstractSocket
+@itemx Category: Sockets-Streams
+
+This class models server side sockets.  The basic model is that the
+server socket is created and bound to some well known port.  It then
+listens for and accepts connections.  At that point the client and
+server sockets are ready to communicate with one another utilizing
+whatever application layer protocol they desire.
+
+As with the other AbstractSocket subclasses, most instance methods of
+this class simply redirect their calls to an implementation class.
+@end table
+
+@menu
+* Sockets.ServerSocket class-accessing::  (class)
+* Sockets.ServerSocket class-instance creation::  (class)
+* Sockets.ServerSocket-accessing::  (instance)
+* Sockets.ServerSocket-initializing::  (instance)
+@end menu
+
+
+
+@node Sockets.ServerSocket class-accessing
+@subsection Sockets.ServerSocket class:@- accessing
+
+@table @b
+@meindex defaultImplementationClassFor:@-
+@item defaultImplementationClassFor:@- aSocketAddressClass
+Answer the default implementation class.
+
+
+@end table
+
+
+
+@node Sockets.ServerSocket class-instance creation
+@subsection Sockets.ServerSocket class:@- instance creation
+
+@table @b
+@meindex defaultQueueSize
+@slindex accept
+@item defaultQueueSize
+Answer the default length of the queue for pending connections.  When
+the queue fills, new clients attempting to connect fail until the server
+has sent #accept to accept a connection from the queue.
+
+
+@meindex port:@-
+@item port:@- anInteger
+Answer a new ServerSocket serving on any local address, on the given
+port, with a pending connections queue of the default length.
+
+
+@meindex port:@-bindTo:@-
+@item port:@- anInteger bindTo:@- ipAddress
+Answer a new ServerSocket serving on the given address and port,
+with a pending connections queue of the default length.
+
+
+@meindex port:@-queueSize:@-
+@item port:@- anInteger queueSize:@- backlog
+Answer a new ServerSocket serving on any local address, on the given
+port, with a pending connections queue of the given length.
+
+
+@meindex port:@-queueSize:@-bindTo:@-
+@item port:@- anInteger queueSize:@- backlog bindTo:@- ipAddress
+Answer a new ServerSocket serving on the given address and port,
+and with a pending connections queue of the given length.
+
+
+@meindex queueSize:@-
+@item queueSize:@- backlog
+Answer a new ServerSocket serving on any local address and port, with a
+pending connections queue of the given length.
+
+
+@meindex queueSize:@-bindTo:@-
+@item queueSize:@- backlog bindTo:@- ipAddress
+Answer a new ServerSocket serving on the given local address,
+and on any port, with a pending connections queue of the given length.
+
+
+@end table
+
+
+
+@node Sockets.ServerSocket-accessing
+@subsection Sockets.ServerSocket:@- accessing
+
+@table @b
+@meindex accept
+@item accept
+Accept a new connection and create a new instance of Socket if there is
+one, else answer nil.
+
+
+@meindex accept:@-
+@item accept:@- socketClass
+Accept a new connection and create a new instance of socketClass if
+there is one, else answer nil.  This is usually needed only to create
+DatagramSockets.
+
+
+@meindex address
+@item address
+Answer the local address
+
+
+@meindex port
+@item port
+Answer the local port (the port that the passive socket is listening on).
+
+
+@meindex primAccept:@-
+@item primAccept:@- socketClass
+Accept a new connection and create a new instance of Socket if there is
+one, else fail.
+
+
+@meindex waitForConnection
+@item waitForConnection
+Wait for a connection to be available, and suspend the currently
+executing process in the meanwhile.
+
+
+@end table
+
+
+
+@node Sockets.ServerSocket-initializing
+@subsection Sockets.ServerSocket:@- initializing
+
+@table @b
+@meindex port:@-queueSize:@-bindTo:@-
+@item port:@- anInteger queueSize:@- backlog bindTo:@- localAddr
+Initialize the ServerSocket so that it serves on the given
+address and port, and has a pending connections queue of
+the given length.
+
+
+@end table
+
+@node Sockets.Socket
+@section Sockets.Socket
+@clindex Sockets.Socket
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.StreamSocket
+@itemx Category: Sockets-Streams
+
+This class adds read and write buffers to the basic model of AbstractSocket.
+@end table
+
+@menu
+* Sockets.Socket class-accessing::  (class)
+* Sockets.Socket class-tests::  (class)
+* Sockets.Socket class-well known ports::  (class)
+* Sockets.Socket-stream protocol::  (instance)
+@end menu
+
+
+
+@node Sockets.Socket class-accessing
+@subsection Sockets.Socket class:@- accessing
+
+@table @b
+@meindex writeBufferSize
+@item writeBufferSize
+Answer the size of the write buffer for newly-created sockets
+
+
+@meindex writeBufferSize:@-
+@item writeBufferSize:@- anInteger
+Set the size of the write buffer for newly-created sockets
+
+
+@end table
+
+
+
+@node Sockets.Socket class-tests
+@subsection Sockets.Socket class:@- tests
+
+@table @b
+@meindex datagramLoopbackTest
+@item datagramLoopbackTest
+Send data from one datagram socket to another on the local machine. Tests most of the
+socket primitives and works with different processes.
+
+
+@meindex datagramLoopbackTestOn:@-
+@item datagramLoopbackTestOn:@- addressClass
+Send data from one datagram socket to another on the local machine. Tests most of the
+socket primitives and works with different processes.
+
+
+@meindex loopbackTest
+@item loopbackTest
+Send data from one socket to another on the local machine. Tests most of
+the socket primitives.
+
+
+@meindex loopbackTest:@-
+@item loopbackTest:@- bufferSizes
+Send data from one socket to another on the local machine. Tests most of
+the socket primitives.  The parameter is the size of the input and
+output buffer sizes.
+
+
+@meindex loopbackTest:@-addressClass:@-
+@item loopbackTest:@- bufferSizes addressClass:@- addressClass
+Send data from one socket to another on the local machine. Tests most of
+the socket primitives.  The parameters are the size of the input and
+output buffer sizes, and the address class (family) to use.
+
+
+@meindex loopbackTestOn:@-
+@item loopbackTestOn:@- addressClass
+Send data from one socket to another on the local machine. Tests most of
+the socket primitives.  The parameter is the address class (family)
+to use.
+
+
+@meindex microTest
+@item microTest
+Extremely small test (try to receive SMTP header)
+
+
+@meindex producerConsumerTest
+@item producerConsumerTest
+Send data from one datagram socket to another on the local machine. Tests most of the
+socket primitives and works with different processes.
+
+
+@meindex producerConsumerTestOn:@-
+@item producerConsumerTestOn:@- addressClass
+Send data from one socket to another on the local machine. Tests most of the
+socket primitives and works with different processes.
+
+
+@meindex sendTest
+@item sendTest
+Send data to the 'discard' socket of localhost.
+
+
+@meindex sendTest:@-
+@item sendTest:@- host
+Send data to the 'discard' socket of the given host. Tests the speed of
+one-way data transfers across the network to the given host. Note that
+many hosts do not run a discard server.
+
+
+@meindex testPort2For:@-
+@item testPort2For:@- anAddressClass
+Not commented.
+
+@meindex testPortFor:@-
+@item testPortFor:@- anAddressClass
+Not commented.
+
+@meindex tweakedLoopbackTest
+@item tweakedLoopbackTest
+Send data from one socket to another on the local machine, trying to avoid
+buffering overhead.  Tests most of the socket primitives.  Comparison of
+the results of loopbackTest and tweakedLoopbackTest should give a measure
+of the overhead of buffering when sending/receiving large quantities of
+data.
+
+
+@end table
+
+
+
+@node Sockets.Socket class-well known ports
+@subsection Sockets.Socket class:@- well known ports
+
+@table @b
+@meindex initialize
+@item initialize
+Initialize the receiver's defaults
+
+
+@end table
+
+
+
+@node Sockets.Socket-stream protocol
+@subsection Sockets.Socket:@- stream protocol
+
+@table @b
+@meindex canWrite
+@item canWrite
+Answer whether more data is available in the socket's read buffer
+or from the operating system.
+
+
+@meindex ensureWriteable
+@item ensureWriteable
+Answer whether more data is available in the socket's read buffer
+or from the operating system.
+
+
+@meindex flush
+@item flush
+Flush the write buffer to the operating system
+
+
+@meindex next:@-putAll:@-startingAt:@-
+@item next:@- n putAll:@- aCollection startingAt:@- pos
+Write aString to the socket; this acts as a bit-bucket when
+the socket is closed.  This might yield control to other
+Smalltalk Processes.
+
+
+@meindex nextPut:@-
+@item nextPut:@- char
+Write a character to the socket; this acts as a bit-bucket when
+the socket is closed.  This might yield control to other
+Smalltalk Processes.
+
+
+@meindex writeBufferSize:@-
+@item writeBufferSize:@- size
+Create a new write buffer of the given size, flushing the
+old one is needed.  This might yield control to other
+Smalltalk Processes.
+
+
+@end table
+
+@node Sockets.SocketAddress
+@section Sockets.SocketAddress
+@clindex Sockets.SocketAddress
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Object
+@itemx Category: Sockets-Protocols
+
+This class is the abstract class for machine addresses over a network.
+It also fulfills the function of the C style functions gethostname(),
+gethostbyname(), and gethostbyaddr(), resolves machine names into their
+corresponding numeric addresses (via DNS, /etc/hosts, or other mechanisms)
+and vice versa.
+@end table
+
+@menu
+* Sockets.SocketAddress class-abstract::  (class)
+* Sockets.SocketAddress class-accessing::  (class)
+* Sockets.SocketAddress class-C call-outs::  (class)
+* Sockets.SocketAddress class-C constants::  (class)
+* Sockets.SocketAddress class-creating sockets::  (class)
+* Sockets.SocketAddress class-host name lookup::  (class)
+* Sockets.SocketAddress class-initialization::  (class)
+* Sockets.SocketAddress-accessing::  (instance)
+* Sockets.SocketAddress-testing::  (instance)
+@end menu
+
+
+
+@node Sockets.SocketAddress class-abstract
+@subsection Sockets.SocketAddress class:@- abstract
+
+@table @b
+@meindex extractFromSockAddr:@-port:@-
+@item extractFromSockAddr:@- aByteArray port:@- portAdaptor
+Private - Answer a new SocketAddress from a ByteArray containing a
+C sockaddr structure.  The portAdaptor's value is changed
+to contain the port that the structure refers to.
+
+
+@meindex fromSockAddr:@-port:@-
+@item fromSockAddr:@- aByteArray port:@- portAdaptor
+Private - Answer a new IPAddress from a ByteArray containing a
+C sockaddr structure.  The portAdaptor's value is changed
+to contain the port that the structure refers to.  Raise an error
+if the address family is unknown.
+
+
+@end table
+
+
+
+@node Sockets.SocketAddress class-accessing
+@subsection Sockets.SocketAddress class:@- accessing
+
+@table @b
+@meindex anyLocalAddress
+@item anyLocalAddress
+Answer an IPAddress representing a local address.
+
+
+@meindex at:@-cache:@-
+@item at:@- host cache:@- aBlock
+Private - Answer the list of addresses associated to the
+given host in the cache.  If the host is not cached yet,
+evaluate aBlock and cache and answer the result.
+
+
+@meindex defaultDatagramSocketImplClass
+@item defaultDatagramSocketImplClass
+Answer the class that, by default, is used to map between the
+Socket's protocol and a low-level C interface.
+
+
+@meindex defaultDatagramSocketImplClass:@-
+@item defaultDatagramSocketImplClass:@- aClass
+Set which class will be used by default to map between the
+receiver's protocol and a low-level C interface.
+
+
+@meindex defaultRawSocketImplClass
+@item defaultRawSocketImplClass
+Answer the class that, by default, is used to map between the
+Socket's protocol and a low-level C interface.
+
+
+@meindex defaultRawSocketImplClass:@-
+@item defaultRawSocketImplClass:@- aClass
+Set which class will be used by default to map between the
+receiver's protocol and a low-level C interface.
+
+
+@meindex defaultStreamSocketImplClass
+@item defaultStreamSocketImplClass
+Answer the class that, by default, is used to map between the
+Socket's protocol and a low-level C interface.
+
+
+@meindex defaultStreamSocketImplClass:@-
+@item defaultStreamSocketImplClass:@- aClass
+Set which class will be used by default to map between the
+receiver's protocol and a low-level C interface.
+
+
+@meindex isDigitAddress:@-
+@item isDigitAddress:@- aString
+Answer whether the receiver can interpret aString as a valid
+address without going through a resolver.
+
+
+@meindex localHostName
+@item localHostName
+Answer the name of the local machine.
+
+
+@meindex loopbackHost
+@item loopbackHost
+Answer an instance of the receiver representing the local machine
+(127.0.0.1 in the IPv4 family).
+
+
+@meindex unknownAddress
+@item unknownAddress
+Answer an instance of the receiver representing an unknown machine
+(0.0.0.0 in the IPv4 family).
+
+
+@end table
+
+
+
+@node Sockets.SocketAddress class-C call-outs
+@subsection Sockets.SocketAddress class:@- C call-outs
+
+@table @b
+@meindex primLocalName
+@item primLocalName
+Not commented.
+
+@meindex primName:@-len:@-type:@-
+@item primName:@- address len:@- len type:@- addressFamily
+Not commented.
+
+@end table
+
+
+
+@node Sockets.SocketAddress class-C constants
+@subsection Sockets.SocketAddress class:@- C constants
+
+@table @b
+@meindex addressFamily
+@item addressFamily
+Not commented.
+
+@meindex aiAddrconfig
+@item aiAddrconfig
+Not commented.
+
+@meindex aiCanonname
+@item aiCanonname
+Not commented.
+
+@meindex protocolFamily
+@item protocolFamily
+Not commented.
+
+@end table
+
+
+
+@node Sockets.SocketAddress class-creating sockets
+@subsection Sockets.SocketAddress class:@- creating sockets
+
+@table @b
+@meindex newRawSocket
+@item newRawSocket
+Create a new raw socket, providing access to low-level network protocols
+and interfaces for the protocol family represented by the receiver
+(for example, the C protocol family PF_INET for the IPAddress class)
+Ordinary user programs usually have no need to use this method.
+
+
+@end table
+
+
+
+@node Sockets.SocketAddress class-host name lookup
+@subsection Sockets.SocketAddress class:@- host name lookup
+
+@table @b
+@meindex allByName:@-
+@item allByName:@- aString
+Answer all the IP addresses that refer to the the given host.  If
+a digit address is passed in aString, the result is an array
+containing the single passed address.  If the host could not be
+resolved to an IP address, answer nil.
+
+
+@meindex byName:@-
+@slindex fromString:@-
+@item byName:@- aString
+Answer a single IP address that refer to the the given host.  If
+a digit address is passed in aString, the result is the same as
+using #fromString:@-.  If the host could not be resolved to an IP
+address, answer nil.
+
+
+@end table
+
+
+
+@node Sockets.SocketAddress class-initialization
+@subsection Sockets.SocketAddress class:@- initialization
+
+@table @b
+@meindex anyLocalAddress:@-
+@item anyLocalAddress:@- anObject
+Private - Store an object representing a local address in the address
+family for the receiver
+
+
+@meindex createLoopbackHost
+@item createLoopbackHost
+Answer an object representing the loopback host in the address
+family for the receiver.
+
+
+@meindex createUnknownAddress
+@item createUnknownAddress
+Answer an object representing an unkown address in the address
+family for the receiver
+
+
+@meindex flush
+@item flush
+Flush the cached IP addresses.
+
+
+@meindex initLocalAddresses
+@item initLocalAddresses
+Private - Initialize the anyLocalAddress class-instance variable
+for the entire hierarchy.
+
+
+@meindex update:@-
+@item update:@- aspect
+Flush all the caches for IPAddress subclasses
+
+
+@end table
+
+
+
+@node Sockets.SocketAddress-accessing
+@subsection Sockets.SocketAddress:@- accessing
+
+@table @b
+@meindex =
+@item = aSocketAddress
+Answer whether the receiver and aSocketAddress represent
+the same machine.  The host name is not checked because
+an IPAddress created before a DNS is activated is named
+after its numbers-and-dots notation, while the same IPAddress,
+created when a DNS is active, is named after its resolved name.
+
+
+@meindex asByteArray
+@item asByteArray
+Convert the receiver to a ByteArray passed to the operating system's
+socket functions)
+
+
+@meindex hash
+@item hash
+Answer an hash value for the receiver
+
+
+@meindex name
+@item name
+Answer the host name (or the digit notation if the DNS could not
+resolve the address).  If the DNS answers a different IP address
+for the same name, the second response is not cached and the digit
+notation is also returned (somebody's likely playing strange jokes
+with your DNS).
+
+
+@end table
+
+
+
+@node Sockets.SocketAddress-testing
+@subsection Sockets.SocketAddress:@- testing
+
+@table @b
+@meindex isMulticast
+@item isMulticast
+Answer whether an address is reserved for multicast connections.
+
+
+@end table
+
+@node Sockets.SocketImpl
+@section Sockets.SocketImpl
+@clindex Sockets.SocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.AbstractSocketImpl
+@itemx Category: Sockets-Protocols
+
+This abstract class serves as the parent class for stream socket
+implementations.
+@end table
+
+@menu
+* Sockets.SocketImpl class-parameters::  (class)
+* Sockets.SocketImpl-abstract::  (instance)
+* Sockets.SocketImpl-socket operations::  (instance)
+@end menu
+
+
+
+@node Sockets.SocketImpl class-parameters
+@subsection Sockets.SocketImpl class:@- parameters
+
+@table @b
+@meindex socketType
+@item socketType
+Answer the socket type parameter for `create'.
+
+
+@end table
+
+
+
+@node Sockets.SocketImpl-abstract
+@subsection Sockets.SocketImpl:@- abstract
+
+@table @b
+@meindex outOfBandImplClass
+@item outOfBandImplClass
+Return an implementation class to be used for out-of-band data
+on the receiver.
+
+
+@end table
+
+
+
+@node Sockets.SocketImpl-socket operations
+@subsection Sockets.SocketImpl:@- socket operations
+
+@table @b
+@meindex connectTo:@-port:@-
+@item connectTo:@- ipAddress port:@- port
+Try to connect the socket represented by the receiver to the given remote
+machine.
+
+
+@meindex getPeerName
+@item getPeerName
+Retrieve a ByteArray containing a sockaddr_in struct for the
+remote endpoint of the socket.
+
+
+@end table
+
+@node Sockets.StreamSocket
+@section Sockets.StreamSocket
+@clindex Sockets.StreamSocket
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.AbstractSocket
+@itemx Category: Sockets-Streams
+
+This class adds a read buffer to the basic model of AbstractSocket.
+@end table
+
+@menu
+* Sockets.StreamSocket class-accessing::  (class)
+* Sockets.StreamSocket class-initialize::  (class)
+* Sockets.StreamSocket class-instance creation::  (class)
+* Sockets.StreamSocket-accessing::  (instance)
+* Sockets.StreamSocket-accessing-reading::  (instance)
+* Sockets.StreamSocket-out-of-band data::  (instance)
+* Sockets.StreamSocket-printing::  (instance)
+* Sockets.StreamSocket-stream protocol::  (instance)
+@end menu
+
+
+
+@node Sockets.StreamSocket class-accessing
+@subsection Sockets.StreamSocket class:@- accessing
+
+@table @b
+@meindex defaultImplementationClassFor:@-
+@item defaultImplementationClassFor:@- aSocketAddressClass
+Answer the default implementation class.  Depending on the
+subclass, this might be the default stream socket implementation
+class of the given address class, or rather its default datagram
+socket implementation class.
+
+
+@meindex readBufferSize
+@item readBufferSize
+Answer the size of the read buffer for newly-created sockets
+
+
+@meindex readBufferSize:@-
+@item readBufferSize:@- anInteger
+Set the size of the read buffer for newly-created sockets
+
+
+@end table
+
+
+
+@node Sockets.StreamSocket class-initialize
+@subsection Sockets.StreamSocket class:@- initialize
+
+@table @b
+@meindex initialize
+@item initialize
+Initialize the receiver's defaults
+
+
+@end table
+
+
+
+@node Sockets.StreamSocket class-instance creation
+@subsection Sockets.StreamSocket class:@- instance creation
+
+@table @b
+@meindex remote:@-port:@-
+@item remote:@- ipAddressOrString port:@- remotePort
+Create a new socket and connect to the given host (passed as a
+String to be resolved or as a SocketAddress), and to the given port.
+
+
+@meindex remote:@-port:@-local:@-port:@-
+@item remote:@- ipAddressOrString port:@- remotePort local:@- ipAddress port:@- localPort
+Create a new socket and connect to the given host (passed as a
+String to be resolved or as a SocketAddress), and to the given remotePort.
+Then bind it to the local address passed in ipAddress, on the localPort
+port; if the former is nil, any local address will do, and if the latter
+is 0, any local port will do.
+
+
+@end table
+
+
+
+@node Sockets.StreamSocket-accessing
+@subsection Sockets.StreamSocket:@- accessing
+
+@table @b
+@meindex address
+@item address
+Answer the address of the remote endpoint
+
+
+@meindex port
+@item port
+Answer the port of the remote endpoint
+
+
+@end table
+
+
+
+@node Sockets.StreamSocket-accessing-reading
+@subsection Sockets.StreamSocket:@- accessing-reading
+
+@table @b
+@meindex nextAvailable:@-into:@-startingAt:@-
+@item nextAvailable:@- anInteger into:@- aCollection startingAt:@- pos
+Place up to anInteger objects from the receiver into
+aCollection, starting from position pos and stopping if
+no more data is available.
+
+
+@meindex nextAvailable:@-putAllOn:@-
+@item nextAvailable:@- anInteger putAllOn:@- aStream
+Copy up to anInteger objects from the receiver to
+aStream, stopping if no more data is available.
+
+
+@end table
+
+
+
+@node Sockets.StreamSocket-out-of-band data
+@subsection Sockets.StreamSocket:@- out-of-band data
+
+@table @b
+@meindex outOfBand
+@item outOfBand
+Return a datagram socket to be used for receiving out-of-band data
+on the receiver.
+
+
+@end table
+
+
+
+@node Sockets.StreamSocket-printing
+@subsection Sockets.StreamSocket:@- printing
+
+@table @b
+@meindex printOn:@-
+@item printOn:@- aStream
+Print a representation of the receiver on aStream
+
+
+@end table
+
+
+
+@node Sockets.StreamSocket-stream protocol
+@subsection Sockets.StreamSocket:@- stream protocol
+
+@table @b
+@meindex atEnd
+@item atEnd
+Answer whether more data is available on the socket
+
+
+@meindex availableBytes
+@item availableBytes
+Answer how many bytes are available in the socket's read buffer
+or from the operating system.
+
+
+@meindex bufferContents
+@item bufferContents
+Answer the current contents of the read buffer
+
+
+@meindex canRead
+@item canRead
+Answer whether more data is available in the socket's read buffer
+or from the operating system.
+
+
+@meindex close
+@item close
+Flush and close the socket.
+
+
+@meindex fill
+@item fill
+Fill the read buffer with data read from the socket
+
+
+@meindex isPeerAlive
+@item isPeerAlive
+Answer whether the connection with the peer remote machine is still
+valid.
+
+
+@meindex next
+@item next
+Read a byte from the socket.  This might yield control to other
+Smalltalk Processes.
+
+
+@meindex peek
+@item peek
+Read a byte from the socket, without advancing the buffer; answer
+nil if no more data is available.  This might yield control to other
+Smalltalk Processes.
+
+
+@meindex peekFor:@-
+@item peekFor:@- anObject
+Read a byte from the socket, advancing the buffer only if it matches
+anObject; answer whether they did match or not.  This might yield
+control to other Smalltalk Processes.
+
+
+@meindex readBufferSize:@-
+@item readBufferSize:@- size
+Create a new read buffer of the given size (which is only
+possible before the first read or if the current buffer is
+empty).
+
+
+@end table
+
+@node Sockets.TCPSocketImpl
+@section Sockets.TCPSocketImpl
+@clindex Sockets.TCPSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.SocketImpl
+@itemx Category: Sockets-Protocols
+
+Unless the application installs its own implementation, this is the
+default socket implementation that will be used for IPv4 stream
+sockets.  It uses C call-outs to implement standard BSD style sockets
+of family AF_INET and type SOCK_STREAM.
+@end table
+
+@menu
+* Sockets.TCPSocketImpl class-C constants::  (class)
+* Sockets.TCPSocketImpl-socket options::  (instance)
+@end menu
+
+
+
+@node Sockets.TCPSocketImpl class-C constants
+@subsection Sockets.TCPSocketImpl class:@- C constants
+
+@table @b
+@meindex ipprotoTcp
+@item ipprotoTcp
+Not commented.
+
+@meindex protocol
+@item protocol
+Not commented.
+
+@meindex tcpNodelay
+@item tcpNodelay
+Not commented.
+
+@end table
+
+
+
+@node Sockets.TCPSocketImpl-socket options
+@subsection Sockets.TCPSocketImpl:@- socket options
+
+@table @b
+@meindex valueWithoutBuffering:@-
+@item valueWithoutBuffering:@- aBlock
+Evaluate aBlock, ensuring that any data that it writes to the socket
+is sent immediately to the network.
+
+
+@end table
+
+@node Sockets.UDPSocketImpl
+@section Sockets.UDPSocketImpl
+@clindex Sockets.UDPSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.MulticastSocketImpl
+@itemx Category: Sockets-Protocols
+
+Unless the application installs its own implementation, this is the
+default socket implementation that will be used for IPv4 datagram
+sockets.  It uses C call-outs to implement standard BSD style sockets
+of family AF_INET and type SOCK_DGRAM.
+@end table
+
+@menu
+* Sockets.UDPSocketImpl class-C constants::  (class)
+* Sockets.UDPSocketImpl-multicasting::  (instance)
+@end menu
+
+
+
+@node Sockets.UDPSocketImpl class-C constants
+@subsection Sockets.UDPSocketImpl class:@- C constants
+
+@table @b
+@meindex ipprotoIp
+@item ipprotoIp
+Not commented.
+
+@meindex protocol
+@item protocol
+Not commented.
+
+@end table
+
+
+
+@node Sockets.UDPSocketImpl-multicasting
+@subsection Sockets.UDPSocketImpl:@- multicasting
+
+@table @b
+@meindex ipMulticastIf
+@item ipMulticastIf
+Answer the local device for a multicast socket (in the form of
+an address)
+
+
+@meindex ipMulticastIf:@-
+@item ipMulticastIf:@- interface
+Set the local device for a multicast socket (in the form of
+an address, usually anyLocalAddress)
+
+
+@meindex join:@-
+@item join:@- ipAddress
+Join the multicast socket at the given address
+
+
+@meindex leave:@-
+@item leave:@- ipAddress
+Leave the multicast socket at the given address
+
+
+@meindex primJoinLeave:@-option:@-
+@item primJoinLeave:@- ipAddress option:@- opt
+Private - Used to join or leave a multicast service.
+
+
+@meindex timeToLive
+@item timeToLive
+Answer the time to live of the datagrams sent through the receiver
+to a multicast socket.
+
+
+@meindex timeToLive:@-
+@item timeToLive:@- ttl
+Set the time to live of the datagrams sent through the receiver
+to a multicast socket.
+
+
+@end table
+
+@node Sockets.UnixAddress
+@section Sockets.UnixAddress
+@clindex Sockets.UnixAddress
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.SocketAddress
+@itemx Category: Sockets-Protocols
+
+This class represents an address for a machine using the AF_UNIX
+address family.  Since this address family is only used for local
+sockets, the class is a singleton; the filesystem path to the socket
+is represented using the port argument to socket functions, as either
+a String or a File object.
+
+@end table
+
+@menu
+* Sockets.UnixAddress class-C constants::  (class)
+* Sockets.UnixAddress class-initialization::  (class)
+* Sockets.UnixAddress class-instance creation::  (class)
+* Sockets.UnixAddress-accessing::  (instance)
+* Sockets.UnixAddress-printing::  (instance)
+* Sockets.UnixAddress-testing::  (instance)
+@end menu
+
+
+
+@node Sockets.UnixAddress class-C constants
+@subsection Sockets.UnixAddress class:@- C constants
+
+@table @b
+@meindex addressFamily
+@item addressFamily
+Not commented.
+
+@meindex protocolFamily
+@item protocolFamily
+Not commented.
+
+@end table
+
+
+
+@node Sockets.UnixAddress class-initialization
+@subsection Sockets.UnixAddress class:@- initialization
+
+@table @b
+@meindex createLoopbackHost
+@item createLoopbackHost
+Answer an object representing the loopback host in the address
+family for the receiver.  This is 127.0.0.1 for IPv4.
+
+
+@meindex createUnknownAddress
+@item createUnknownAddress
+Answer an object representing an unkown address in the address
+family for the receiver
+
+
+@meindex initialize
+@item initialize
+Set up the default implementation classes for the receiver
+
+
+@end table
+
+
+
+@node Sockets.UnixAddress class-instance creation
+@subsection Sockets.UnixAddress class:@- instance creation
+
+@table @b
+@meindex fromSockAddr:@-port:@-
+@item fromSockAddr:@- aByteArray port:@- portAdaptor
+Private - Answer the unique UnixAddress instance, filling
+in the portAdaptor's value from a ByteArray containing a
+C sockaddr_in structure.
+
+
+@meindex uniqueInstance
+@item uniqueInstance
+Not commented.
+
+@end table
+
+
+
+@node Sockets.UnixAddress-accessing
+@subsection Sockets.UnixAddress:@- accessing
+
+@table @b
+@meindex =
+@item = aSocketAddress
+Answer whether the receiver and aSocketAddress represent
+the same socket on the same machine.
+
+
+@meindex hash
+@item hash
+Answer an hash value for the receiver
+
+
+@end table
+
+
+
+@node Sockets.UnixAddress-printing
+@subsection Sockets.UnixAddress:@- printing
+
+@table @b
+@meindex printOn:@-
+@item printOn:@- aStream
+Print the receiver in dot notation.
+
+
+@end table
+
+
+
+@node Sockets.UnixAddress-testing
+@subsection Sockets.UnixAddress:@- testing
+
+@table @b
+@meindex isMulticast
+@item isMulticast
+Answer whether an address is reserved for multicast connections.
+
+
+@end table
+
+@node Sockets.UnixDatagramSocketImpl
+@section Sockets.UnixDatagramSocketImpl
+@clindex Sockets.UnixDatagramSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.DatagramSocketImpl
+@itemx Category: Sockets-Protocols
+
+This class represents a datagram socket using the AF_UNIX address family.
+It unlinks the filesystem path when the socket is closed.
+
+@end table
+
+@menu
+* Sockets.UnixDatagramSocketImpl-socket operations::  (instance)
+@end menu
+
+
+
+@node Sockets.UnixDatagramSocketImpl-socket operations
+@subsection Sockets.UnixDatagramSocketImpl:@- socket operations
+
+@table @b
+@meindex close
+@item close
+Not commented.
+
+@end table
+
+@node Sockets.UnixSocketImpl
+@section Sockets.UnixSocketImpl
+@clindex Sockets.UnixSocketImpl
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: Sockets.SocketImpl
+@itemx Category: Sockets-Protocols
+
+This class represents a stream socket using the AF_UNIX address family.
+It unlinks the filesystem path when the socket is closed.
+
+@end table
+
+@menu
+* Sockets.UnixSocketImpl-socket operations::  (instance)
+@end menu
+
+
+
+@node Sockets.UnixSocketImpl-socket operations
+@subsection Sockets.UnixSocketImpl:@- socket operations
+
+@table @b
+@meindex close
+@item close
+Not commented.
+
+@end table
+
+@node Sockets.WriteBuffer
+@section Sockets.WriteBuffer
+@clindex Sockets.WriteBuffer
+
+@table @b
+@item Defined in namespace Sockets
+@itemx Superclass: WriteStream
+@itemx Category: Examples-Useful tools
+
+I'm a WriteStream that, instead of growing the collection,
+evaluates an user defined block and starts over with the same
+collection.
+@end table
+
+@menu
+* Sockets.WriteBuffer-accessing-writing::  (instance)
+* Sockets.WriteBuffer-buffer handling::  (instance)
+* Sockets.WriteBuffer-testing::  (instance)
+@end menu
+
+
+
+@node Sockets.WriteBuffer-accessing-writing
+@subsection Sockets.WriteBuffer:@- accessing-writing
+
+@table @b
+@meindex next:@-putAll:@-startingAt:@-
+@item next:@- n putAll:@- aCollection startingAt:@- pos
+Put n characters or bytes of aCollection, starting at the pos-th,
+in the collection buffer.
+
+
+@end table
+
+
+
+@node Sockets.WriteBuffer-buffer handling
+@subsection Sockets.WriteBuffer:@- buffer handling
+
+@table @b
+@meindex close
+@item close
+Not commented.
+
+@meindex flush
+@item flush
+Evaluate the flushing block and reset the stream
+
+
+@meindex flushBlock:@-
+@item flushBlock:@- block
+Set which block will be used to flush the buffer.
+The block will be evaluated with a collection and
+an Integer n as parameters, and will have to write
+the first n elements of the collection.
+
+
+@end table
+
+
+
+@node Sockets.WriteBuffer-testing
+@subsection Sockets.WriteBuffer:@- testing
+
+@table @b
+@meindex isFull
+@item isFull
+Not commented.
+
+@end table
+

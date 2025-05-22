@@ -1,0 +1,705 @@
+@c Define the class index, method index, and selector cross-reference
+@ifclear CLASS-INDICES
+@set CLASS-INDICES
+@defindex cl
+@defcodeindex me
+@defcodeindex sl 
+@end ifclear
+
+@c These are used for both TeX and HTML
+@set BEFORE1
+@set  AFTER1
+@set BEFORE2
+@set  AFTER2
+
+@ifinfo
+@c Use asis so that leading and trailing spaces are meaningful.
+@c Remember we're inside a @menu command, hence the blanks are
+@c kept in the output.
+@set BEFORE1 @asis{* }
+@set  AFTER1 @asis{::}
+@set BEFORE2 @asis{  (}
+@set  AFTER2 @asis{)}
+@end ifinfo
+
+@macro class {a,b}
+@value{BEFORE1}\a\\a\@b{\b\}@value{AFTER1}
+@end macro
+@macro superclass {a,b}
+\a\\a\@value{BEFORE2}@i{\b\}@value{AFTER2}
+@end macro
+
+@ifnotinfo
+@macro begindetailmenu
+@display
+@end macro
+@macro enddetailmenu
+@end display
+@end macro
+@end ifnotinfo
+
+@ifinfo
+@macro begindetailmenu
+@detailmenu
+@end macro
+@macro enddetailmenu
+@end detailmenu
+@end macro
+@end ifinfo
+
+@iftex
+@macro beginmenu
+@end macro
+@macro endmenu
+@end macro
+@end iftex
+
+@ifnottex
+@macro beginmenu
+@menu
+@end macro
+@macro endmenu
+@end menu
+@end macro
+@end ifnottex
+
+@beginmenu
+@ifnottex
+Alphabetic list:
+* ZLib.DeflateStream::
+* ZLib.DeflateWriteStream::
+* ZLib.GZipDeflateStream::
+* ZLib.GZipDeflateWriteStream::
+* ZLib.GZipInflateStream::
+* ZLib.InflateStream::
+* ZLib.RawDeflateStream::
+* ZLib.RawDeflateWriteStream::
+* ZLib.RawInflateStream::
+* ZLib.ZlibError::
+* ZLib.ZlibReadStream::
+* ZLib.ZlibStream::
+* ZLib.ZlibWriteStream::
+@end ifnottex
+
+@ifinfo
+Class tree:
+@end ifinfo
+@iftex
+@section Tree
+@end iftex
+@ifnotinfo
+
+Classes documented in this manual are @b{boldfaced}.
+
+@end ifnotinfo
+@begindetailmenu
+@superclass{@t{}, Object}
+@superclass{@t{ }, Exception}
+@superclass{@t{  }, Error}
+@class{@t{   }, ZLib.ZlibError}
+@superclass{@t{ }, Iterable}
+@superclass{@t{  }, Stream}
+@class{@t{   }, ZLib.ZlibStream}
+@class{@t{    }, ZLib.ZlibReadStream}
+@class{@t{     }, ZLib.RawDeflateStream}
+@class{@t{      }, ZLib.DeflateStream}
+@class{@t{      }, ZLib.GZipDeflateStream}
+@class{@t{     }, ZLib.RawInflateStream}
+@class{@t{      }, ZLib.GZipInflateStream}
+@class{@t{      }, ZLib.InflateStream}
+@class{@t{    }, ZLib.ZlibWriteStream}
+@class{@t{     }, ZLib.RawDeflateWriteStream}
+@class{@t{      }, ZLib.DeflateWriteStream}
+@class{@t{      }, ZLib.GZipDeflateWriteStream}
+@enddetailmenu
+@endmenu
+@unmacro class
+@unmacro superclass
+@unmacro endmenu
+@unmacro beginmenu
+@unmacro enddetailmenu
+@unmacro begindetailmenu
+@node ZLib.DeflateStream
+@section ZLib.DeflateStream
+@clindex ZLib.DeflateStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.RawDeflateStream
+@itemx Category: Examples-Useful
+Instances of this class produce "standard"
+(zlib, RFC1950) deflated data.
+@end table
+
+@menu
+* ZLib.DeflateStream class-instance creation::  (class)
+@end menu
+
+
+
+@node ZLib.DeflateStream class-instance creation
+@subsection ZLib.DeflateStream class:@- instance creation
+
+@table @b
+@meindex compressingTo:@-
+@slindex nextPut:@-
+@item compressingTo:@- aStream
+Answer a stream that receives data via #nextPut:@- and compresses it onto
+aStream.
+
+
+@meindex compressingTo:@-level:@-
+@slindex nextPut:@-
+@item compressingTo:@- aStream level:@- level
+Answer a stream that receives data via #nextPut:@- and compresses it onto
+aStream with the given compression level.
+
+
+@end table
+
+@node ZLib.DeflateWriteStream
+@section ZLib.DeflateWriteStream
+@clindex ZLib.DeflateWriteStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.RawDeflateWriteStream
+@itemx Category: Examples-Useful
+Instances of this class produce "standard"
+(zlib, RFC1950) deflated data.
+@end table
+
+@menu
+@end menu
+
+@node ZLib.GZipDeflateStream
+@section ZLib.GZipDeflateStream
+@clindex ZLib.GZipDeflateStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.RawDeflateStream
+@itemx Category: Examples-Useful
+Instances of this class produce GZip (RFC1952)
+deflated data.
+@end table
+
+@menu
+* ZLib.GZipDeflateStream class-instance creation::  (class)
+@end menu
+
+
+
+@node ZLib.GZipDeflateStream class-instance creation
+@subsection ZLib.GZipDeflateStream class:@- instance creation
+
+@table @b
+@meindex compressingTo:@-
+@slindex nextPut:@-
+@item compressingTo:@- aStream
+Answer a stream that receives data via #nextPut:@- and compresses it onto
+aStream.
+
+
+@meindex compressingTo:@-level:@-
+@slindex nextPut:@-
+@item compressingTo:@- aStream level:@- level
+Answer a stream that receives data via #nextPut:@- and compresses it onto
+aStream with the given compression level.
+
+
+@end table
+
+@node ZLib.GZipDeflateWriteStream
+@section ZLib.GZipDeflateWriteStream
+@clindex ZLib.GZipDeflateWriteStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.RawDeflateWriteStream
+@itemx Category: Examples-Useful
+Instances of this class produce GZip (RFC1952)
+deflated data.
+@end table
+
+@menu
+@end menu
+
+@node ZLib.GZipInflateStream
+@section ZLib.GZipInflateStream
+@clindex ZLib.GZipInflateStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.RawInflateStream
+@itemx Category: Examples-Useful
+Instances of this class reinflate GZip (RFC1952)
+deflated data.
+@end table
+
+@menu
+@end menu
+
+@node ZLib.InflateStream
+@section ZLib.InflateStream
+@clindex ZLib.InflateStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.RawInflateStream
+@itemx Category: Examples-Useful
+Instances of this class reinflate "standard"
+(zlib, RFC1950) deflated data.
+@end table
+
+@menu
+@end menu
+
+@node ZLib.RawDeflateStream
+@section ZLib.RawDeflateStream
+@clindex ZLib.RawDeflateStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.ZlibReadStream
+@itemx Category: Examples-Useful
+Instances of this class produce "raw" (PKZIP)
+deflated data.
+@end table
+
+@menu
+* ZLib.RawDeflateStream class-instance creation::  (class)
+@end menu
+
+
+
+@node ZLib.RawDeflateStream class-instance creation
+@subsection ZLib.RawDeflateStream class:@- instance creation
+
+@table @b
+@meindex compressingTo:@-
+@slindex nextPut:@-
+@item compressingTo:@- aStream
+Answer a stream that receives data via #nextPut:@- and compresses it onto
+aStream.
+
+
+@meindex compressingTo:@-level:@-
+@slindex nextPut:@-
+@item compressingTo:@- aStream level:@- level
+Answer a stream that receives data via #nextPut:@- and compresses it onto
+aStream with the given compression level.
+
+
+@meindex on:@-
+@item on:@- aStream
+Answer a stream that compresses the data in aStream with the default
+compression level.
+
+
+@meindex on:@-level:@-
+@item on:@- aStream level:@- compressionLevel
+Answer a stream that compresses the data in aStream with the given
+compression level.
+
+
+@end table
+
+@node ZLib.RawDeflateWriteStream
+@section ZLib.RawDeflateWriteStream
+@clindex ZLib.RawDeflateWriteStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.ZlibWriteStream
+@itemx Category: Examples-Useful
+Instances of this class produce "raw" (PKZIP)
+deflated data.
+@end table
+
+@menu
+* ZLib.RawDeflateWriteStream class-instance creation::  (class)
+@end menu
+
+
+
+@node ZLib.RawDeflateWriteStream class-instance creation
+@subsection ZLib.RawDeflateWriteStream class:@- instance creation
+
+@table @b
+@meindex on:@-
+@item on:@- aWriteStream
+Answer a stream that compresses the data in aStream with the default
+compression level.
+
+
+@meindex on:@-level:@-
+@item on:@- aWriteStream level:@- compressionLevel
+Answer a stream that compresses the data in aStream with the given
+compression level.
+
+
+@end table
+
+@node ZLib.RawInflateStream
+@section ZLib.RawInflateStream
+@clindex ZLib.RawInflateStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.ZlibReadStream
+@itemx Category: Examples-Useful
+Instances of this class reinflate "raw" (PKZIP)
+deflated data.
+@end table
+
+@menu
+* ZLib.RawInflateStream-positioning::  (instance)
+@end menu
+
+
+
+@node ZLib.RawInflateStream-positioning
+@subsection ZLib.RawInflateStream:@- positioning
+
+@table @b
+@meindex copyFrom:@-to:@-
+@slindex position
+@item copyFrom:@- start to:@- end
+Answer the data on which the receiver is streaming, from
+the start-th item to the end-th.  Note that this method is 0-based,
+unlike the one in Collection, because a Stream's #position method
+returns 0-based values.  Notice that this class can only provide
+the illusion of random access, by appropriately rewinding the input
+stream or skipping compressed data.
+
+
+@meindex isPositionable
+@slindex skip:@-
+@item isPositionable
+Answer true if the stream supports moving backwards with #skip:@-.
+
+
+@meindex position:@-
+@item position:@- anInteger
+Set the current position in the stream to anInteger.  Notice that this
+class can only provide the illusion of random access, by appropriately
+rewinding the input stream or skipping compressed data.
+
+
+@meindex reset
+@item reset
+Reset the stream to the beginning of the compressed data.
+
+
+@meindex skip:@-
+@item skip:@- anInteger
+Move the current position by anInteger places, either forwards or
+backwards.
+
+
+@end table
+
+@node ZLib.ZlibError
+@section ZLib.ZlibError
+@clindex ZLib.ZlibError
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: Error
+@itemx Category: Examples-Useful
+This exception is raised whenever there is an error
+in a compressed stream.
+@end table
+
+@menu
+* ZLib.ZlibError-accessing::  (instance)
+@end menu
+
+
+
+@node ZLib.ZlibError-accessing
+@subsection ZLib.ZlibError:@- accessing
+
+@table @b
+@meindex stream
+@item stream
+Answer the ZlibStream that caused the error.
+
+
+@meindex stream:@-
+@item stream:@- anObject
+Set the ZlibStream that caused the error.
+
+
+@end table
+
+@node ZLib.ZlibReadStream
+@section ZLib.ZlibReadStream
+@clindex ZLib.ZlibReadStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.ZlibStream
+@itemx Category: Examples-Useful
+This abstract class implements the basic buffering that is
+used for communication with zlib.
+@end table
+
+@menu
+* ZLib.ZlibReadStream-accessing-reading::  (instance)
+* ZLib.ZlibReadStream-streaming::  (instance)
+@end menu
+
+
+
+@node ZLib.ZlibReadStream-accessing-reading
+@subsection ZLib.ZlibReadStream:@- accessing-reading
+
+@table @b
+@meindex nextAvailable:@-into:@-startingAt:@-
+@item nextAvailable:@- anInteger into:@- aCollection startingAt:@- pos
+Place up to anInteger objects from the receiver into
+aCollection, starting from position pos and stopping if
+no more data is available.
+
+
+@meindex nextAvailable:@-putAllOn:@-
+@item nextAvailable:@- anInteger putAllOn:@- aStream
+Copy up to anInteger objects from the receiver to
+aStream, stopping if no more data is available.
+
+
+@end table
+
+
+
+@node ZLib.ZlibReadStream-streaming
+@subsection ZLib.ZlibReadStream:@- streaming
+
+@table @b
+@meindex atEnd
+@item atEnd
+Answer whether the stream has got to an end
+
+
+@meindex next
+@item next
+Return the next object (character or byte) in the receiver.
+
+
+@meindex peek
+@item peek
+Returns the next element of the stream without moving the pointer.
+Returns nil when at end of stream.
+
+
+@meindex peekFor:@-
+@item peekFor:@- anObject
+Returns true and gobbles the next element from the stream of it is
+equal to anObject, returns false and doesn't gobble the next element
+if the next element is not equal to anObject.
+
+
+@meindex position
+@item position
+Answer the current value of the stream pointer.  Note that only inflating
+streams support random access to the stream data.
+
+
+@end table
+
+@node ZLib.ZlibStream
+@section ZLib.ZlibStream
+@clindex ZLib.ZlibStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: Stream
+@itemx Category: Examples-Useful
+This abstract class implements the basic interface to
+the zlib module.  Its layout matches what is expected by the C code.
+@end table
+
+@menu
+* ZLib.ZlibStream class-accessing::  (class)
+* ZLib.ZlibStream class-instance creation::  (class)
+* ZLib.ZlibStream-streaming::  (instance)
+@end menu
+
+
+
+@node ZLib.ZlibStream class-accessing
+@subsection ZLib.ZlibStream class:@- accessing
+
+@table @b
+@meindex bufferSize
+@item bufferSize
+Answer the size of the output buffers that are passed to zlib.  Each
+zlib stream uses a buffer of this size.
+
+
+@meindex bufferSize:@-
+@item bufferSize:@- anInteger
+Set the size of the output buffers that are passed to zlib.  Each
+zlib stream uses a buffer of this size.
+
+
+@meindex defaultCompressionLevel
+@item defaultCompressionLevel
+Return the default compression level used by deflating streams.
+
+
+@meindex defaultCompressionLevel:@-
+@item defaultCompressionLevel:@- anInteger
+Set the default compression level used by deflating streams.  It
+should be a number between 1 and 9.
+
+
+@end table
+
+
+
+@node ZLib.ZlibStream class-instance creation
+@subsection ZLib.ZlibStream class:@- instance creation
+
+@table @b
+@meindex new
+@item new
+This method should not be called for instances of this class.
+
+@meindex on:@-
+@item on:@- aStream
+Answer an instance of the receiver that decorates aStream.
+
+
+@end table
+
+
+
+@node ZLib.ZlibStream-streaming
+@subsection ZLib.ZlibStream:@- streaming
+
+@table @b
+@meindex isExternalStream
+@item isExternalStream
+Answer whether the receiver streams on a file or socket.
+
+
+@meindex name
+@item name
+Return the name of the underlying stream.
+
+
+@meindex species
+@slindex upTo:@-
+@item species
+Return the type of the collections returned by #upTo:@- etc.
+
+
+@meindex stream
+@item stream
+Answer the wrapped stream.
+
+
+@end table
+
+@node ZLib.ZlibWriteStream
+@section ZLib.ZlibWriteStream
+@clindex ZLib.ZlibWriteStream
+
+@table @b
+@item Defined in namespace ZLib
+@itemx Superclass: ZLib.ZlibStream
+@itemx Category: Examples-Useful
+This abstract class implements the basic buffering
+that is used for communication with zlib in a WriteStream decorator.
+@end table
+
+@menu
+* ZLib.ZlibWriteStream-streaming::  (instance)
+@end menu
+
+
+
+@node ZLib.ZlibWriteStream-streaming
+@subsection ZLib.ZlibWriteStream:@- streaming
+
+@table @b
+@meindex close
+@item close
+Finish the deflated output to the destination stream using Z_FINISH.
+The destination stream is closed, which implies flushing.
+
+
+@meindex contents
+@slindex contents
+@item contents
+Finish the deflated output to the destination stream using Z_FINISH and
+return the deflated data (requires the destination stream to support
+#contents).
+
+
+@meindex finish
+@item finish
+Finish the deflated output to the destination stream using Z_FINISH.
+The destination stream is not flushed.
+
+
+@meindex flush
+@item flush
+Flush the deflated output to the destination stream, and flush the
+destination stream.
+
+
+@meindex flushBuffer
+@item flushBuffer
+Flush the deflated output to the destination stream.
+
+
+@meindex flushDictionary
+@item flushDictionary
+Flush the deflated output to the destination stream using Z_FULL_FLUSH,
+and flush the destination stream.
+
+
+@meindex next:@-putAll:@-startingAt:@-
+@item next:@- n putAll:@- aCollection startingAt:@- pos
+Put n characters or bytes of aCollection, starting at the pos-th,
+in the deflation buffer.
+
+
+@meindex nextPut:@-
+@item nextPut:@- aByte
+Append a character or byte (depending on whether the destination
+stream works on a ByteArray or String) to the deflation buffer.
+
+
+@meindex partialFlush
+@item partialFlush
+Flush the deflated output to the destination stream using Z_PARTIAL_FLUSH,
+and flush the destination stream.
+
+
+@meindex position
+@item position
+Answer the number of compressed bytes written.
+
+
+@meindex readStream
+@slindex readStream
+@item readStream
+Finish the deflated output to the destination stream using Z_FINISH and
+return a ReadStream on the deflated data (requires the destination
+stream to support #readStream).
+
+
+@meindex syncFlush
+@item syncFlush
+Flush the deflated output to the destination stream using Z_SYNC_FLUSH,
+and flush the destination stream.  Note that this includes the four
+bytes 0/0/255/255 at the end of the flush.
+
+
+@end table
+

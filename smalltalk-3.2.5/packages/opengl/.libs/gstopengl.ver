@@ -1,0 +1,7 @@
+{ global:
+gst_initModule;
+gst_initModule_gl;
+gst_initModule_glu;
+gst_initModule_gluNurbs;
+gst_initModule_gluTess;
+local: *; };

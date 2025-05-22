@@ -1,0 +1,6 @@
+#! /bin/sh
+abs_top_builddir=/home/milan/workspace/2025/smalltalk-3.2.5
+: ${LIBTOOL=$abs_top_builddir/libtool}
+
+export LTDL_LIBRARY_PATH=$abs_top_builddir${LTDL_LIBRARY_PATH:+:$LTDL_LIBRARY_PATH}
+exec $LIBTOOL --mode=execute  -dlopen "${abs_top_builddir}/packages/gdbm/gdbm.la" -dlopen "${abs_top_builddir}/packages/i18n/i18n.la" -dlopen "${abs_top_builddir}/packages/iconv/iconv.la" -dlopen "${abs_top_builddir}/packages/digest/digest.la" -dlopen "${abs_top_builddir}/packages/opengl/gstopengl.la" -dlopen "${abs_top_builddir}/packages/sdl/libsdl/sdl.la" -dlopen "${abs_top_builddir}/packages/xml/expat/expat.la" -dlopen "${abs_top_builddir}/packages/zlib/zlib.la" $abs_top_builddir/gst ${1+"$@"}
